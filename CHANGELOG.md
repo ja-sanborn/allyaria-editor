@@ -1,8 +1,9 @@
 # Change Log
 
-## [Maj.Min.Rel] - YYYY-MM-DD
+## [Maj.Min.Rev] - YYYY-MM-DD
 ### Added
 - ...
 
 ### Fixed
 - ...
+
