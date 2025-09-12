@@ -501,3 +501,33 @@ http-client.private.env.json
 # Apifox Helper cache
 .idea/.cache/.Apifox_Helper
 .idea/ApifoxUploaderProjectSetting.xml
+
+# macOS / Windows OS junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Rider occasionally creates this for .sln projects
+*.sln.iml
+
+# Environment files
+.env.*
+!.env.example
+
+# Azure Functions local settings
+local.settings.json
+
+# JS/TS build & debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.tsbuildinfo
+
+# JS coverage (tools like Jest)
+coverage/
+
+# Build artifacts
+dist/
+build/
