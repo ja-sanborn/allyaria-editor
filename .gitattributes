@@ -1,0 +1,37 @@
+# Normalize line endings to LF in repo, convert to CRLF on Windows checkout
+* text=auto eol=lf
+
+# Ensure specific file types always use LF
+*.sh   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.editorconfig text eol=lf
+
+# Windows batch files should use CRLF
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# Treat these as binary (no diff/merge)
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.exe  binary
+*.dll  binary
+
+# Improve diffs for common text-based formats
+*.cs   diff=csharp
+*.csproj diff=xml
+*.props diff=xml
+*.targets diff=xml
+*.xaml diff=xml
+*.razor diff=html
+*.scss  diff=css
+*.css   diff=css
+*.js    diff=javascript
+*.ts    diff=javascript

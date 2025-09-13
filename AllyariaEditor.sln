@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ". root", ". root", "{8A4C86
 		LICENSE = LICENSE
 		README.md = README.md
 		SECURITY.md = SECURITY.md
+		.gitattributes = .gitattributes
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{493084B8-8B91-4A63-A4EE-D816F4822061}"
