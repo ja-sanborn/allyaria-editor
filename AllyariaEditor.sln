@@ -26,11 +26,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4930
 	ProjectSection(SolutionItems) = preProject
 		.github\CODEOWNERS = .github\CODEOWNERS
 		.github\dependabot.yml.bak = .github\dependabot.yml.bak
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "standards", "standards", "{910B2B97-5E69-40A0-8160-C9DBF4BD59C7}"
+	ProjectSection(SolutionItems) = preProject
+		docs\standards\CSharp.md = docs\standards\CSharp.md
+		docs\standards\JavaScript.md = docs\standards\JavaScript.md
+		docs\standards\SCSS.md = docs\standards\SCSS.md
+		docs\standards\Razor.md = docs\standards\Razor.md
+		docs\standards\Accessibility.md = docs\standards\Accessibility.md
+		docs\standards\Localization.md = docs\standards\Localization.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{F2D6F24B-5CED-4FA0-A0E8-1C82002105D8}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
 	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{910B2B97-5E69-40A0-8160-C9DBF4BD59C7} = {A61BD759-DA7B-4021-872F-6A3F53988EA6}
+		{F2D6F24B-5CED-4FA0-A0E8-1C82002105D8} = {493084B8-8B91-4A63-A4EE-D816F4822061}
 	EndGlobalSection
 EndGlobal
