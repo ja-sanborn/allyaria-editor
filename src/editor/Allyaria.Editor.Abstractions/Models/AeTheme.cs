@@ -1,4 +1,6 @@
-﻿namespace Allyaria.Editor.Abstractions;
+﻿using Allyaria.Editor.Abstractions.Types;
+
+namespace Allyaria.Editor.Abstractions.Models;
 
 /// <summary>
 /// Represents runtime aeTheme options applied to AllyariaEditor. Immutable by design; specify all values via the

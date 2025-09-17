@@ -1,0 +1,18 @@
+﻿@if (Region == ToolbarRegion.Toolbar)
+{
+    <div id="ae-toolbar"
+         class="ae-toolbar"
+         style="@ToolbarStyle"
+         @attributes="GetAriaAttributesForToolbar()">
+        @* Toolbar content placeholder *@
+    </div>
+}
+else
+{
+    <div id="ae-status"
+         class="ae-status"
+         style="@StatusStyle"
+         @attributes="GetAriaAttributesForStatus()">
+        @* Status bar content placeholder *@
+    </div>
+}

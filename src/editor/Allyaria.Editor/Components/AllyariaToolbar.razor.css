@@ -1,0 +1,9 @@
+﻿.ae-toolbar {
+    padding: var(--ae-spacing);
+    min-height: 36px;
+}
+
+.ae-status {
+    padding: var(--ae-spacing);
+    min-height: 28px;
+}

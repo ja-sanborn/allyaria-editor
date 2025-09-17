@@ -1,14 +1,16 @@
-﻿using Allyaria.Editor.Abstractions;
+﻿using Allyaria.Editor.Abstractions.Models;
+using Allyaria.Editor.Abstractions.Types;
 using Allyaria.Editor.Components;
+using Allyaria.Tests.Component.Helpers;
 
-namespace Allyaria.Tests.Component;
+namespace Allyaria.Tests.Component.Components;
 
 public class EditorContainerTests : TestContext
 {
     [Fact]
     public void Aria_Name_Defaults_From_Resx_When_No_Overrides()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>();
         var content = cut.Find("#ae-content");
@@ -21,9 +23,13 @@ public class EditorContainerTests : TestContext
     public void BackgroundImage_Overrides_RegionBackgrounds_And_UsesOverlay50()
     {
         // Arrange
-        SetupSanitizer();
+        JSInterop.SetupSanitizeLabelledBy();
 
-        var theme = new AeTheme(AeThemeType.Dark, BackgroundImage: "paper.png");
+        var theme = new AeTheme(
+            AeThemeType.Dark,
+            BackgroundImage: "paper.png"
+        );
+
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
 
         // Act
@@ -46,9 +52,13 @@ public class EditorContainerTests : TestContext
     public void ContentBackground_Explicit_Overrides_Default()
     {
         // Arrange
-        SetupSanitizer();
+        JSInterop.SetupSanitizeLabelledBy();
 
-        var theme = new AeTheme(AeThemeType.Light, ContentBackground: "#ffeeee");
+        var theme = new AeTheme(
+            AeThemeType.Light,
+            ContentBackground: "#ffeeee"
+        );
+
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
 
         // Act
@@ -61,12 +71,12 @@ public class EditorContainerTests : TestContext
     [Fact]
     public void Default_Size_Is_400x300()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>();
         var container = cut.Find("div.ae-editor");
 
-        var style = container.GetAttribute("style");
+        var style = container.GetAttribute("style") ?? string.Empty;
         Assert.Contains("width: 400px", style);
         Assert.Contains("height: 300px", style);
     }
@@ -74,7 +84,7 @@ public class EditorContainerTests : TestContext
     [Fact]
     public async Task Focus_And_Blur_Events_Fire()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var focused = false;
         var blurred = false;
@@ -96,19 +106,19 @@ public class EditorContainerTests : TestContext
     [Fact]
     public void HeightZero_Fills_Parent()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Height, 0));
         var container = cut.Find("div.ae-editor");
 
-        var style = container.GetAttribute("style");
+        var style = container.GetAttribute("style") ?? string.Empty;
         Assert.Contains("height: 100%", style);
     }
 
     [Fact]
     public void Invalid_LabelledBy_Falls_Back_To_Default_Label()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(
                 x => x.AeLabels, new AeLabels(ContentLabelledById: "badId")
@@ -116,14 +126,13 @@ public class EditorContainerTests : TestContext
         );
 
         var content = cut.Find("#ae-content");
-
         Assert.Equal("Editor content", content.GetAttribute("aria-label"));
     }
 
     [Fact]
     public void Placeholder_Shown_And_Announced_When_Text_Empty()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>(p => p
             .Add(x => x.Text, string.Empty)
@@ -134,13 +143,13 @@ public class EditorContainerTests : TestContext
         Assert.Equal("Start typing...", placeholder.TextContent.Trim());
 
         var content = cut.Find("#ae-content");
-        Assert.Contains("ae-placeholder", content.GetAttribute("aria-describedby"));
+        Assert.Contains("ae-placeholder", content.GetAttribute("aria-describedby") ?? string.Empty);
     }
 
     [Fact]
     public void Programmatic_Update_Displays_Text()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Text, "Initial"));
         cut.SetParametersAndRender(p => p.Add(x => x.Text, "Updated"));
@@ -152,7 +161,7 @@ public class EditorContainerTests : TestContext
     [Fact]
     public void Role_Is_Textbox()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>();
         var content = cut.Find("#ae-content");
@@ -160,13 +169,10 @@ public class EditorContainerTests : TestContext
         Assert.Equal("textbox", content.GetAttribute("role"));
     }
 
-    private void SetupSanitizer()
-        => JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
-
     [Fact]
     public void Stable_Region_IDs_Render()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>();
         Assert.NotNull(cut.Find("#ae-toolbar"));
@@ -177,14 +183,12 @@ public class EditorContainerTests : TestContext
     [Fact]
     public void Theme_Light_Defaults_Applied()
     {
-        // Arrange
-        SetupSanitizer();
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>(p => p
             .Add(x => x.Theme, new AeTheme(AeThemeType.Light))
         );
 
-        // Act
         var container = cut.Find("div.ae-editor");
         var toolbar = cut.Find("#ae-toolbar");
         var content = cut.Find("#ae-content");
@@ -197,23 +201,23 @@ public class EditorContainerTests : TestContext
         var wrapperStyle = wrapper.GetAttribute("style") ?? string.Empty;
         var statusStyle = status.GetAttribute("style") ?? string.Empty;
 
-        // Assert (Light defaults from GetDefaults)
-        Assert.Contains("border: 1px solid #d0d7de", containerStyle); // border default
-        Assert.Contains("background-color: #f6f8fa", toolbarStyle); // toolbar bg
-        Assert.Contains("background-color: #ffffff", wrapperStyle); // content bg
-        Assert.Contains("background-color: #f6f8fa", statusStyle); // status bg
+        // Light defaults from GetDefaults
+        Assert.Contains("border: 1px solid #d0d7de", containerStyle);
+        Assert.Contains("background-color: #f6f8fa", toolbarStyle);
+        Assert.Contains("background-color: #ffffff", wrapperStyle);
+        Assert.Contains("background-color: #f6f8fa", statusStyle);
 
-        Assert.Contains("color: #24292f", toolbarStyle); // toolbar fg
-        Assert.Contains("color: #24292f", contentStyle); // content fg
-        Assert.Contains("caret-color: #24292f", contentStyle); // caret
-        Assert.Contains("color: #24292f", statusStyle); // status fg
+        Assert.Contains("color: #24292f", toolbarStyle);
+        Assert.Contains("color: #24292f", contentStyle);
+        Assert.Contains("caret-color: #24292f", contentStyle);
+        Assert.Contains("color: #24292f", statusStyle);
     }
 
     [Fact]
     public void Theme_Runtime_Switch_Updates_Immediately()
     {
         // Arrange
-        SetupSanitizer();
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>(p =>
             p.Add(x => x.Theme, new AeTheme(AeThemeType.Light))
@@ -228,7 +232,7 @@ public class EditorContainerTests : TestContext
             p.Add(x => x.Theme, new AeTheme(AeThemeType.Dark))
         );
 
-        // Assert: updates without the reload
+        // Assert: updates without reload
         var wrapperStyleAfter = wrapper.GetAttribute("style") ?? string.Empty;
         Assert.Contains("background-color: #0f1115", wrapperStyleAfter);
     }
@@ -237,8 +241,8 @@ public class EditorContainerTests : TestContext
     public void Theme_System_Resolves_To_HighContrast_When_SystemIsHC()
     {
         // Arrange
-        SetupSanitizer();
-        JSInterop.Setup<string>("Allyaria_Editor_detectSystemTheme", _ => true).SetResult("hc");
+        JSInterop.SetupSanitizeLabelledBy();
+        JSInterop.SetupDetectSystemTheme("hc");
 
         var cut = RenderComponent<AllyariaEditor>(p =>
             p.Add(x => x.Theme, new AeTheme(AeThemeType.System))
@@ -259,9 +263,14 @@ public class EditorContainerTests : TestContext
     public void Transparent_Removes_Backgrounds_Parent_ShowsThrough()
     {
         // Arrange
-        SetupSanitizer();
+        JSInterop.SetupSanitizeLabelledBy();
 
-        var theme = new AeTheme(AeThemeType.Light, true, BackgroundImage: "paper.png");
+        var theme = new AeTheme(
+            AeThemeType.Light,
+            true,
+            BackgroundImage: "paper.png" // should be ignored when Transparent
+        );
+
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
 
         // Act
@@ -280,7 +289,7 @@ public class EditorContainerTests : TestContext
     [Fact]
     public async Task Typing_Updates_Binding_And_Fires_TextChanged()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         string? updated = null;
 
@@ -290,14 +299,12 @@ public class EditorContainerTests : TestContext
         );
 
         // Simulate JS returning edited innerHTML
-        JSInterop.Setup<string>("Allyaria_Editor_getInnerHtml", _ => true).SetResult("Hello world");
+        JSInterop.SetupGetInnerHtml("Hello world");
 
         var content = cut.Find("#ae-content");
         await content.TriggerEventAsync("oninput", new ChangeEventArgs());
 
         Assert.Equal("Hello world", updated);
-
-        // DOM should reflect updated text
         Assert.Contains("Hello world", content.InnerHtml);
     }
 
@@ -305,8 +312,7 @@ public class EditorContainerTests : TestContext
     public void Valid_AriaLabelledBy_Takes_Precedence()
     {
         // Simulate sanitizer returning a valid id, regardless of input
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true)
-            .SetResult("heading1");
+        JSInterop.SetupSanitizeLabelledBy("heading1");
 
         var cut = RenderComponent<AllyariaEditor>(p =>
             p.Add(x => x.AeLabels, new AeLabels(ContentLabelledById: "heading1"))
@@ -320,7 +326,7 @@ public class EditorContainerTests : TestContext
     [Fact]
     public void Whitespace_Override_Falls_Back_To_Default()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.AeLabels, new AeLabels("   ")));
         var container = cut.Find("div.ae-editor");
@@ -331,12 +337,12 @@ public class EditorContainerTests : TestContext
     [Fact]
     public void WidthZero_Fills_Parent()
     {
-        JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+        JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Width, 0));
         var container = cut.Find("div.ae-editor");
 
-        var style = container.GetAttribute("style");
+        var style = container.GetAttribute("style") ?? string.Empty;
         Assert.Contains("width: 100%", style);
     }
 }

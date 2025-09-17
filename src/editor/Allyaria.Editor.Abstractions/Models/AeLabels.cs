@@ -1,4 +1,4 @@
-﻿namespace Allyaria.Editor.Abstractions;
+﻿namespace Allyaria.Editor.Abstractions.Models;
 
 /// <summary>Defines ARIA label overrides and labeled-by ID sources for the editor and its regions.</summary>
 /// <param name="Container">

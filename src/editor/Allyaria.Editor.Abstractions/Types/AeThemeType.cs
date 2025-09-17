@@ -1,4 +1,4 @@
-﻿namespace Allyaria.Editor.Abstractions;
+﻿namespace Allyaria.Editor.Abstractions.Types;
 
 /// <summary>Defines built-in aeTheme options.</summary>
 public enum AeThemeType
