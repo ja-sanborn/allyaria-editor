@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\editor\Allyaria.Editor\Allyaria.Editor.csproj"/>
+    </ItemGroup>
+</Project>

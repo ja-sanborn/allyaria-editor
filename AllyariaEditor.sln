@@ -76,6 +76,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Allyaria.Tools.Benchmarks",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Allyaria.Tools.Analyzers", "tools\Allyaria.Tools.Analyzers\Allyaria.Tools.Analyzers.csproj", "{0B18A4A6-6DE6-4678-AA4A-8664B447D879}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Allyaria.Tools.SampleSite", "tools\Allyaria.Tools.SampleSite\Allyaria.Tools.SampleSite.csproj", "{90FBC1DE-A9B1-45B2-98E4-3C74B2B98A32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,7 @@ Global
 		{739115F1-2338-4141-89D7-B31A5F61B6DC} = {B3DA8043-0209-4318-8950-835C59AAD8D2}
 		{53FA0849-1F70-474E-9EDF-E0D3951FF569} = {DED658B6-9204-4927-A97F-5B52128BD09A}
 		{0B18A4A6-6DE6-4678-AA4A-8664B447D879} = {DED658B6-9204-4927-A97F-5B52128BD09A}
+		{90FBC1DE-A9B1-45B2-98E4-3C74B2B98A32} = {DED658B6-9204-4927-A97F-5B52128BD09A}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{196BBE22-A416-4CDE-9FCD-0BA41C430DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -144,5 +147,9 @@ Global
 		{0B18A4A6-6DE6-4678-AA4A-8664B447D879}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B18A4A6-6DE6-4678-AA4A-8664B447D879}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B18A4A6-6DE6-4678-AA4A-8664B447D879}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90FBC1DE-A9B1-45B2-98E4-3C74B2B98A32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90FBC1DE-A9B1-45B2-98E4-3C74B2B98A32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90FBC1DE-A9B1-45B2-98E4-3C74B2B98A32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90FBC1DE-A9B1-45B2-98E4-3C74B2B98A32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
