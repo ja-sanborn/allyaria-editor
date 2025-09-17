@@ -1,6 +1,8 @@
 # Accessibility Standards (Blazor-focused: C#, Razor, JavaScript, SCSS)
 
-Make every UI usable with screen readers, keyboard, and assistive tech. These standards align with WCAG 2.2 AA and apply across our stack: C#, Razor, JavaScript, and SCSS. Favor semantic HTML, robust keyboard support, localized content, and reduced visual/interaction friction.
+Make every UI usable with screen readers, keyboard, and assistive tech. These standards align with WCAG 2.2 AA and apply
+across our stack: C#, Razor, JavaScript, and SCSS. Favor semantic HTML, robust keyboard support, localized content, and
+reduced visual/interaction friction.
 
 > *Last updated: 2025-09-12*
 
@@ -15,7 +17,8 @@ Make every UI usable with screen readers, keyboard, and assistive tech. These st
 
 ### 2.1 Semantic structure & landmarks
 
-* Use native elements first: `<button>`, `<a>`, `<label>`, `<input>`, `<table>`, `<ul>`, `<nav>`, `<main>`, `<header>`, `<footer>`, `<section>`, `<aside>`.
+* Use native elements first: `<button>`, `<a>`, `<label>`, `<input>`, `<table>`, `<ul>`, `<nav>`, `<main>`, `<header>`,
+  `<footer>`, `<section>`, `<aside>`.
 * One `<h1>` per page route; follow heading order (no skipping levels).
 * Identify landmarks: `<main>`, `<nav>`, `<header>`, `<footer>`, `<aside>`.
 
@@ -55,7 +58,8 @@ Make every UI usable with screen readers, keyboard, and assistive tech. These st
 
 ### 2.4 Interactive controls
 
-* Prefer native controls. If you must build custom widgets, follow WAI-ARIA Authoring Practices (APG) patterns and roles, manage focus, and support keyboard interaction.
+* Prefer native controls. If you must build custom widgets, follow WAI-ARIA Authoring Practices (APG) patterns and
+  roles, manage focus, and support keyboard interaction.
 
 ## 3. C# (Components & Logic)
 
@@ -89,7 +93,8 @@ await JS.InvokeVoidAsync("announce", "Loaded 10 more results.");
 
 ### 3.3 Validation & messages
 
-* Return localized, concise errors. Don’t rely on color alone to indicate state; set boolean states and expose them to markup (e.g., `aria-invalid="true"`).
+* Return localized, concise errors. Don’t rely on color alone to indicate state; set boolean states and expose them to
+  markup (e.g., `aria-invalid="true"`).
 
 ## 4. JavaScript (Interop) Standards
 
@@ -97,7 +102,8 @@ await JS.InvokeVoidAsync("announce", "Loaded 10 more results.");
 
 ### 4.1 Keyboard & focus
 
-* Never trap focus unintentionally. When adding key handlers, **don’t override** native behavior without accessible equivalents.
+* Never trap focus unintentionally. When adding key handlers, **don’t override** native behavior without accessible
+  equivalents.
 * Expose **init**/**dispose** functions and honor cancellation/disposal (for Blazor component teardown).
 
 ```js
@@ -122,11 +128,13 @@ export function announce(message) {
 
 ### 4.2 ARIA & roles
 
-* Only add ARIA when semantic HTML cannot express the role/state. Keep roles/states in **sync** with component state (expanded, selected, busy, modal).
+* Only add ARIA when semantic HTML cannot express the role/state. Keep roles/states in **sync** with component state (
+  expanded, selected, busy, modal).
 
 ### 4.3 Motion
 
-* Respect `prefers-reduced-motion`. Avoid JS-driven parallax or large animations; if necessary, provide a user setting and honor OS preference.
+* Respect `prefers-reduced-motion`. Avoid JS-driven parallax or large animations; if necessary, provide a user setting
+  and honor OS preference.
 
 ## 5. SCSS (Styles) Standards
 
@@ -328,8 +336,10 @@ export function closeDialog(el) {
 ## 15. Governance
 
 * **Definition of Done** includes keyboard nav, focus visibility, screen reader pass, and contrast checks.
-* New components must include an accessibility section in PR description: semantics, keyboard behavior, focus management, and testing notes.
-* Report and track a11y issues with severity; do not block ship on non-critical cosmetic issues, but never waive keyboard/critical blockers.
+* New components must include an accessibility section in PR description: semantics, keyboard behavior, focus
+  management, and testing notes.
+* Report and track a11y issues with severity; do not block ship on non-critical cosmetic issues, but never waive
+  keyboard/critical blockers.
 
 ### Quick Checklist (per component)
 

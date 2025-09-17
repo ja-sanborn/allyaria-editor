@@ -1,6 +1,8 @@
 # Allyaria Editor
 
-**Allyaria Editor** is a **Blazor-native WYSIWYG editor** built for modern .NET apps. It will be designed from the ground up to be **accessible, customizable, and extensible** and written exclusively in Blazor with limited JavaScript interop.
+**Allyaria Editor** is a **Blazor-native WYSIWYG editor** built for modern .NET apps. It will be designed from the
+ground up to be **accessible, customizable, and extensible** and written exclusively in Blazor with limited JavaScript
+interop.
 
 ## Features
 

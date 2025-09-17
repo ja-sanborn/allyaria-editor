@@ -1,23 +1,24 @@
 ﻿<div class="ae-editor"
-     style="@Style"
+     style="@ContainerStyle"
      role="group"
      @attributes="GetContainerAriaAttributes()">
     <div id="ae-toolbar"
          class="ae-toolbar"
+         style="@ToolbarStyle"
          @attributes="GetToolbarAriaAttributes()">
         @* Intentionally empty for this increment *@
     </div>
 
-    <div class="ae-content-wrapper">
+    <div class="ae-content-wrapper" style="@ContentWrapperStyle">
         @if (ShowPlaceholder)
         {
-            <div id="ae-placeholder" class="ae-placeholder">@Placeholder</div>
+            <div id="ae-placeholder" class="ae-placeholder" style="@PlaceholderStyle">@Placeholder</div>
         }
         <div id="ae-content"
              class="ae-content"
              role="textbox"
              contenteditable="true"
-
+             style="@ContentStyle"
              tabindex="0"
              @oninput="OnInputAsync"
              @onfocus="HandleFocusAsync"
@@ -31,6 +32,7 @@
 
     <div id="ae-status"
          class="ae-status"
+         style="@StatusStyle"
          @attributes="GetStatusAriaAttributes()">
         @* Intentionally empty for this increment *@
     </div>

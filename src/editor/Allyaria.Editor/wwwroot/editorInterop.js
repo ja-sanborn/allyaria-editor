@@ -31,3 +31,26 @@ window.Allyaria_Editor_sanitizeLabelledBy = function (ids) {
         return "";
     }
 };
+
+/**
+ * Detects the system theme preference.
+ * Returns one of: "hc" (forced/high-contrast), "dark", "light".
+ */
+window.Allyaria_Editor_detectSystemTheme = function () {
+    try {
+        const supportsMatch = typeof window.matchMedia === "function";
+        if (supportsMatch) {
+            // Windows/macOS forced colors High Contrast
+            if (window.matchMedia("(forced-colors: active)").matches) {
+                return "hc";
+            }
+            // Dark mode
+            if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                return "dark";
+            }
+        }
+        return "light";
+    } catch {
+        return "light";
+    }
+};

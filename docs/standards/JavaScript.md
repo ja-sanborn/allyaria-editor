@@ -1,6 +1,8 @@
 # JavaScript Coding Standards (Blazor-focused)
 
-JavaScript should be avoided unless absolutely necessary, and kept as minimal as possible to achieve the required functionality. Prefer C# / Razor and .NET libraries first. Use JavaScript only when platform/browser APIs are not available in .NET or when integrating a third-party widget that requires JS.
+JavaScript should be avoided unless absolutely necessary, and kept as minimal as possible to achieve the required
+functionality. Prefer C# / Razor and .NET libraries first. Use JavaScript only when platform/browser APIs are not
+available in .NET or when integrating a third-party widget that requires JS.
 
 > *Last updated: 2025-09-12*
 
@@ -22,7 +24,8 @@ JavaScript should be avoided unless absolutely necessary, and kept as minimal as
 * Trim trailing whitespace: yes
 * Indentation: 4 spaces (no tabs)
 
-> Rationale: Matches common cross-platform tooling defaults, ensures clean diffs, and consistent formatting across editors/IDEs.
+> Rationale: Matches common cross-platform tooling defaults, ensures clean diffs, and consistent formatting across
+> editors/IDEs.
 
 ## 3. Language Level & Modules
 
@@ -165,5 +168,7 @@ export function requireNonEmpty(value, name = 'value') {
 
 ## 13. Deviations
 
-If a rule must be violated (interop constraints, performance, or third-party requirements), document the rationale in comments near the code and in the PR description, and keep the deviation as narrow as possible.
+If a rule must be violated (interop constraints, performance, or third-party requirements), document the rationale in
+comments near the code and in the PR description, and keep the deviation as narrow as possible.
+
 ~~~~

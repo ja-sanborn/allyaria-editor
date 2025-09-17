@@ -1,6 +1,7 @@
 # C# Coding Standards
 
-These standards codify our team’s C# practices. They follow Microsoft’s recommended guidelines for .NET and add project-specific rules for consistency, documentation, reliability, and usability of our library code.
+These standards codify our team’s C# practices. They follow Microsoft’s recommended guidelines for .NET and add
+project-specific rules for consistency, documentation, reliability, and usability of our library code.
 
 > *Last updated: 2025-09-12*
 
@@ -12,7 +13,8 @@ These standards codify our team’s C# practices. They follow Microsoft’s reco
 - **Trim trailing whitespace:** Yes (except in Markdown)
 - **Indentation:** 4 spaces (no tabs)
 
-> Rationale: Matches common cross-platform tooling defaults, ensures clean diffs, and consistent formatting across editors/IDEs.
+> Rationale: Matches common cross-platform tooling defaults, ensures clean diffs, and consistent formatting across
+> editors/IDEs.
 
 ## 2. Language Version, Nullable, & General Project Settings
 
@@ -63,7 +65,8 @@ Use this exact order (aligned with Microsoft guidance and our preference):
 ## 5. Braces, Blocks, and Expression Bodies
 
 * **Braces are required** on all control statements—even single-line statements.
-* **Expression-bodied members** are encouraged for concise accessors, constructors, methods, and properties (keep readable).
+* **Expression-bodied members** are encouraged for concise accessors, constructors, methods, and properties (keep
+  readable).
 
 ```csharp
 // ✔️ Braces required
@@ -90,7 +93,8 @@ var name = string.Empty;
 ## 7. Qualification & Usings
 
 * Do **not** require `this.` or type qualification for fields, properties, methods, or events.
-* **System-first usings:** **Not used** (by team choice). Grouping of usings is optional; be consistent within a project.
+* **System-first usings:** **Not used** (by team choice). Grouping of usings is optional; be consistent within a
+  project.
 
 ## 8. Readability: Parentheses & Clarity
 
@@ -99,7 +103,8 @@ var name = string.Empty;
 
 ## 9. XML Documentation Comments: **Required**
 
-> **Policy:** XML documentation comments are **required for all public, protected, internal, and private** types and members: fields, properties, constructors, methods, events, operators, and delegates.
+> **Policy:** XML documentation comments are **required for all public, protected, internal, and private** types and
+> members: fields, properties, constructors, methods, events, operators, and delegates.
 
 * Documentation must state purpose, behavior, contracts, side effects, and noteworthy exceptions.
 * Use `<summary>`, `<param>`, `<returns>`, `<remarks>`, `<example>`, and `<exception>` appropriately.
@@ -148,7 +153,8 @@ public sealed class Widget
 * **Async methods:** end with **`Async`** (see §11).
 * **Interfaces:** `I` prefix (e.g., `IService`).
 * **Type parameters:** `T` prefix (e.g., `TItem`).
-* **Acronyms:** Two-letter acronyms stay uppercase (`IO`), longer acronyms are Pascalized (`XmlReader`, not `XMLReader`).
+* **Acronyms:** Two-letter acronyms stay uppercase (`IO`), longer acronyms are Pascalized (`XmlReader`, not
+  `XMLReader`).
 
 ## 11. Asynchronous Code
 
@@ -168,12 +174,14 @@ public async Task<Result> FetchItemsAsync(int page, CancellationToken cancellati
 }
 ```
 
-> Library guidance: In modern .NET, `ConfigureAwait(false)` is typically unnecessary unless you explicitly need to avoid a captured context in legacy scenarios.
+> Library guidance: In modern .NET, `ConfigureAwait(false)` is typically unnecessary unless you explicitly need to avoid
+> a captured context in legacy scenarios.
 
 ## 12. Exceptions & Error Handling
 
 * **Exceptions are for fatal/critical situations** only (library policy).
-    * For expected/recoverable outcomes, prefer result types (e.g., `OneOf`, `Result<T>`) or documented return contracts.
+    * For expected/recoverable outcomes, prefer result types (e.g., `OneOf`, `Result<T>`) or documented return
+      contracts.
 * Throw the **most specific** exception type; avoid leaking sensitive/internal details.
 * Use **guard clauses** for parameter validation.
 * **Localization is required** for all user-visible messages (see §13).
@@ -191,7 +199,8 @@ public static string RequireNonEmpty(string input, string paramName)
 ## 13. Globalization & Localization
 
 * All **user-facing strings must be localized** (resource-based).
-* Use culture-aware formatting (`ToString(CultureInfo)`, `string.Format` with culture, or `FormattableString.Invariant` where appropriate).
+* Use culture-aware formatting (`ToString(CultureInfo)`, `string.Format` with culture, or `FormattableString.Invariant`
+  where appropriate).
 * Avoid string concatenation for user messages; prefer localized **composite** resources.
 
 ## 14. Immutability & Initialization
@@ -208,4 +217,5 @@ public static string RequireNonEmpty(string input, string paramName)
 
 ## 16. Deviations
 
-Where Microsoft guidance differs from these standards (e.g., `System`-first usings), this document’s rules take precedence for our codebase. Propose changes via PR for team discussion.
+Where Microsoft guidance differs from these standards (e.g., `System`-first usings), this document’s rules take
+precedence for our codebase. Propose changes via PR for team discussion.

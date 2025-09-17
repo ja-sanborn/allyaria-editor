@@ -34,10 +34,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "standards", "standards", "{
 	ProjectSection(SolutionItems) = preProject
 		docs\standards\CSharp.md = docs\standards\CSharp.md
 		docs\standards\JavaScript.md = docs\standards\JavaScript.md
-		docs\standards\SCSS.md = docs\standards\SCSS.md
 		docs\standards\Razor.md = docs\standards\Razor.md
 		docs\standards\Accessibility.md = docs\standards\Accessibility.md
 		docs\standards\Localization.md = docs\standards\Localization.md
+		docs\standards\CSS.md = docs\standards\CSS.md
+		docs\standards\Theming.md = docs\standards\Theming.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{F2D6F24B-5CED-4FA0-A0E8-1C82002105D8}"
