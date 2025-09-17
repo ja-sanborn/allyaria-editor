@@ -1,0 +1,37 @@
+﻿<div class="ae-editor"
+     style="@Style"
+     role="group"
+     @attributes="GetContainerAriaAttributes()">
+    <div id="ae-toolbar"
+         class="ae-toolbar"
+         @attributes="GetToolbarAriaAttributes()">
+        @* Intentionally empty for this increment *@
+    </div>
+
+    <div class="ae-content-wrapper">
+        @if (ShowPlaceholder)
+        {
+            <div id="ae-placeholder" class="ae-placeholder">@Placeholder</div>
+        }
+        <div id="ae-content"
+             class="ae-content"
+             role="textbox"
+             contenteditable="true"
+
+             tabindex="0"
+             @oninput="OnInputAsync"
+             @onfocus="HandleFocusAsync"
+             @onblur="HandleBlurAsync"
+             @attributes="GetContentAriaAttributes()"
+             aria-describedby="@ContentDescribedBy"
+             @ref="_contentRef">
+            @((MarkupString)Text)
+        </div>
+    </div>
+
+    <div id="ae-status"
+         class="ae-status"
+         @attributes="GetStatusAriaAttributes()">
+        @* Intentionally empty for this increment *@
+    </div>
+</div>
