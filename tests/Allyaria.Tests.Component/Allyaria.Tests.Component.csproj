@@ -18,6 +18,5 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\editor\Allyaria.Editor\Allyaria.Editor.csproj"/>
-        <ProjectReference Include="..\..\src\editor\Allyaria.Editor.Abstractions\Allyaria.Editor.Abstractions.csproj"/>
     </ItemGroup>
 </Project>

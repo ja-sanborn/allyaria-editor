@@ -12,4 +12,7 @@
         <PackageReference Include="xunit"/>
         <PackageReference Include="xunit.runner.visualstudio"/>
     </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\editor\Allyaria.Editor\Allyaria.Editor.csproj" />
+    </ItemGroup>
 </Project>
