@@ -18,6 +18,55 @@ public class EditorContainerTests : TestContext
     }
 
     [Fact]
+    public void BackgroundImage_Overrides_RegionBackgrounds_And_UsesOverlay50()
+    {
+        // Arrange
+        SetupSanitizer();
+
+        var theme = new AeTheme(
+            AeThemeType.Dark,
+            BackgroundImage: "paper.png"
+        );
+
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
+
+        // Act
+        var containerStyle = cut.Find("div.ae-editor").GetAttribute("style") ?? string.Empty;
+        var toolbarStyle = cut.Find("#ae-toolbar").GetAttribute("style") ?? string.Empty;
+        var wrapperStyle = cut.Find(".ae-content-wrapper").GetAttribute("style") ?? string.Empty;
+        var statusStyle = cut.Find("#ae-status").GetAttribute("style") ?? string.Empty;
+
+        // Assert (image layer present with 50% overlay; region backgrounds ignored/transparent)
+        Assert.Contains("background-image:", containerStyle);
+        Assert.Contains("linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5))", containerStyle); // Dark overlay50
+        Assert.Contains("url(\"paper.png\")", containerStyle);
+
+        Assert.Contains("background-color: transparent", toolbarStyle);
+        Assert.Contains("background-color: transparent", wrapperStyle);
+        Assert.Contains("background-color: transparent", statusStyle);
+    }
+
+    [Fact]
+    public void ContentBackground_Explicit_Overrides_Default()
+    {
+        // Arrange
+        SetupSanitizer();
+
+        var theme = new AeTheme(
+            AeThemeType.Light,
+            ContentBackground: "#ffeeee"
+        );
+
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
+
+        // Act
+        var wrapperStyle = cut.Find(".ae-content-wrapper").GetAttribute("style") ?? string.Empty;
+
+        // Assert
+        Assert.Contains("background-color: #ffeeee", wrapperStyle);
+    }
+
+    [Fact]
     public void Default_Size_Is_400x300()
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
@@ -119,6 +168,9 @@ public class EditorContainerTests : TestContext
         Assert.Equal("textbox", content.GetAttribute("role"));
     }
 
+    private void SetupSanitizer()
+        => JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
+
     [Fact]
     public void Stable_Region_IDs_Render()
     {
@@ -128,6 +180,113 @@ public class EditorContainerTests : TestContext
         Assert.NotNull(cut.Find("#ae-toolbar"));
         Assert.NotNull(cut.Find("#ae-content"));
         Assert.NotNull(cut.Find("#ae-status"));
+    }
+
+    [Fact]
+    public void Theme_Light_Defaults_Applied()
+    {
+        // Arrange
+        SetupSanitizer();
+
+        var cut = RenderComponent<AllyariaEditor>(p => p
+            .Add(x => x.Theme, new AeTheme(AeThemeType.Light))
+        );
+
+        // Act
+        var container = cut.Find("div.ae-editor");
+        var toolbar = cut.Find("#ae-toolbar");
+        var content = cut.Find("#ae-content");
+        var wrapper = cut.Find(".ae-content-wrapper");
+        var status = cut.Find("#ae-status");
+
+        var containerStyle = container.GetAttribute("style") ?? string.Empty;
+        var toolbarStyle = toolbar.GetAttribute("style") ?? string.Empty;
+        var contentStyle = content.GetAttribute("style") ?? string.Empty;
+        var wrapperStyle = wrapper.GetAttribute("style") ?? string.Empty;
+        var statusStyle = status.GetAttribute("style") ?? string.Empty;
+
+        // Assert (Light defaults from GetDefaults)
+        Assert.Contains("border: 1px solid #d0d7de", containerStyle); // border default
+        Assert.Contains("background-color: #f6f8fa", toolbarStyle); // toolbar bg
+        Assert.Contains("background-color: #ffffff", wrapperStyle); // content bg
+        Assert.Contains("background-color: #f6f8fa", statusStyle); // status bg
+
+        Assert.Contains("color: #24292f", toolbarStyle); // toolbar fg
+        Assert.Contains("color: #24292f", contentStyle); // content fg
+        Assert.Contains("caret-color: #24292f", contentStyle); // caret
+        Assert.Contains("color: #24292f", statusStyle); // status fg
+    }
+
+    [Fact]
+    public void Theme_Runtime_Switch_Updates_Immediately()
+    {
+        // Arrange
+        SetupSanitizer();
+
+        var cut = RenderComponent<AllyariaEditor>(p =>
+            p.Add(x => x.Theme, new AeTheme(AeThemeType.Light))
+        );
+
+        // Verify initial (Light)
+        var wrapper = cut.Find(".ae-content-wrapper");
+        Assert.Contains("background-color: #ffffff", wrapper.GetAttribute("style") ?? string.Empty);
+
+        // Act: switch to Dark at runtime
+        cut.SetParametersAndRender(p =>
+            p.Add(x => x.Theme, new AeTheme(AeThemeType.Dark))
+        );
+
+        // Assert: updates without the reload
+        var wrapperStyleAfter = wrapper.GetAttribute("style") ?? string.Empty;
+        Assert.Contains("background-color: #0f1115", wrapperStyleAfter);
+    }
+
+    [Fact]
+    public void Theme_System_Resolves_To_HighContrast_When_SystemIsHC()
+    {
+        // Arrange
+        SetupSanitizer();
+        JSInterop.Setup<string>("Allyaria_Editor_detectSystemTheme", _ => true).SetResult("hc");
+
+        var cut = RenderComponent<AllyariaEditor>(p =>
+            p.Add(x => x.Theme, new AeTheme(AeThemeType.System))
+        );
+
+        // Act (first render triggers detection + StateHasChanged)
+        var toolbarStyle = cut.Find("#ae-toolbar").GetAttribute("style") ?? string.Empty;
+        var wrapperStyle = cut.Find(".ae-content-wrapper").GetAttribute("style") ?? string.Empty;
+        var contentStyle = cut.Find("#ae-content").GetAttribute("style") ?? string.Empty;
+
+        // Assert (HighContrast defaults: black bg, white fg)
+        Assert.Contains("background-color: #000000", toolbarStyle);
+        Assert.Contains("background-color: #000000", wrapperStyle);
+        Assert.Contains("color: #ffffff", contentStyle);
+    }
+
+    [Fact]
+    public void Transparent_Removes_Backgrounds_Parent_ShowsThrough()
+    {
+        // Arrange
+        SetupSanitizer();
+
+        var theme = new AeTheme(
+            AeThemeType.Light,
+            BackgroundImage: "paper.png" // should be ignored when Transparent
+        );
+
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
+
+        // Act
+        var containerStyle = cut.Find("div.ae-editor").GetAttribute("style") ?? string.Empty;
+        var toolbarStyle = cut.Find("#ae-toolbar").GetAttribute("style") ?? string.Empty;
+        var wrapperStyle = cut.Find(".ae-content-wrapper").GetAttribute("style") ?? string.Empty;
+        var statusStyle = cut.Find("#ae-status").GetAttribute("style") ?? string.Empty;
+
+        // Assert
+        Assert.DoesNotContain("background-image:", containerStyle);
+        Assert.Contains("background-color: transparent", toolbarStyle);
+        Assert.Contains("background-color: transparent", wrapperStyle);
+        Assert.Contains("background-color: transparent", statusStyle);
     }
 
     [Fact]
