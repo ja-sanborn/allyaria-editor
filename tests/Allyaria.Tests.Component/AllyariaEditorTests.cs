@@ -10,7 +10,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>();
+        var cut = RenderComponent<AllyariaEditor>();
         var content = cut.Find("#ae-content");
 
         // Should have aria-label with default
@@ -22,7 +22,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>();
+        var cut = RenderComponent<AllyariaEditor>();
         var container = cut.Find("div.ae-editor");
 
         var style = container.GetAttribute("style");
@@ -38,7 +38,7 @@ public class EditorContainerTests : TestContext
         var focused = false;
         var blurred = false;
 
-        var cut = RenderComponent<EditorContainer>(p => p
+        var cut = RenderComponent<AllyariaEditor>(p => p
             .Add(x => x.OnFocus, EventCallback.Factory.Create(this, () => focused = true))
             .Add(x => x.OnBlur, EventCallback.Factory.Create(this, () => blurred = true))
         );
@@ -57,7 +57,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>(p => p.Add(x => x.Height, 0));
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Height, 0));
         var container = cut.Find("div.ae-editor");
 
         var style = container.GetAttribute("style");
@@ -69,7 +69,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>(p => p.Add(
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(
                 x => x.Labels, new AriaLabels(ContentLabelledById: "badId")
             )
         );
@@ -84,7 +84,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>(p => p
+        var cut = RenderComponent<AllyariaEditor>(p => p
             .Add(x => x.Text, string.Empty)
             .Add(x => x.Placeholder, "Start typing...")
         );
@@ -101,7 +101,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>(p => p.Add(x => x.Text, "Initial"));
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Text, "Initial"));
         cut.SetParametersAndRender(p => p.Add(x => x.Text, "Updated"));
 
         var content = cut.Find("#ae-content");
@@ -113,7 +113,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>();
+        var cut = RenderComponent<AllyariaEditor>();
         var content = cut.Find("#ae-content");
 
         Assert.Equal("textbox", content.GetAttribute("role"));
@@ -124,7 +124,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>();
+        var cut = RenderComponent<AllyariaEditor>();
         Assert.NotNull(cut.Find("#ae-toolbar"));
         Assert.NotNull(cut.Find("#ae-content"));
         Assert.NotNull(cut.Find("#ae-status"));
@@ -137,7 +137,7 @@ public class EditorContainerTests : TestContext
 
         string? updated = null;
 
-        var cut = RenderComponent<EditorContainer>(parameters => parameters
+        var cut = RenderComponent<AllyariaEditor>(parameters => parameters
             .Add(p => p.Text, "Hello")
             .Add(p => p.TextChanged, v => updated = v)
         );
@@ -161,7 +161,7 @@ public class EditorContainerTests : TestContext
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true)
             .SetResult("heading1");
 
-        var cut = RenderComponent<EditorContainer>(p =>
+        var cut = RenderComponent<AllyariaEditor>(p =>
             p.Add(x => x.Labels, new AriaLabels(ContentLabelledById: "heading1"))
         );
 
@@ -175,7 +175,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>(p => p.Add(x => x.Labels, new AriaLabels("   ")));
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Labels, new AriaLabels("   ")));
         var container = cut.Find("div.ae-editor");
 
         Assert.Equal("Editor", container.GetAttribute("aria-label"));
@@ -186,7 +186,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<EditorContainer>(p => p.Add(x => x.Width, 0));
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Width, 0));
         var container = cut.Find("div.ae-editor");
 
         var style = container.GetAttribute("style");

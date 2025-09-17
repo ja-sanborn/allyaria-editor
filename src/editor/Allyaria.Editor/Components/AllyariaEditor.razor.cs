@@ -10,7 +10,7 @@ namespace Allyaria.Editor.Components;
 /// A core editor container that renders toolbar, content, and status regions with sizing, accessibility, localization, and
 /// theming hooks.
 /// </summary>
-public partial class EditorContainer : ComponentBase
+public partial class AllyariaEditor : ComponentBase
 {
     /// <summary>The sanitized space-separated ID list for the container's <c>aria-labelledby</c> attribute.</summary>
     private string _containerLabelledByResolved = string.Empty;
