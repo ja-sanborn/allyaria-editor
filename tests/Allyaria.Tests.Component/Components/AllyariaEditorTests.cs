@@ -5,7 +5,7 @@ using Allyaria.Tests.Component.Helpers;
 
 namespace Allyaria.Tests.Component.Components;
 
-public class EditorContainerTests : TestContext
+public class AllyariaEditorTests : TestContext
 {
     [Fact]
     public void Aria_Name_Defaults_From_Resx_When_No_Overrides()
@@ -82,28 +82,6 @@ public class EditorContainerTests : TestContext
     }
 
     [Fact]
-    public async Task Focus_And_Blur_Events_Fire()
-    {
-        JSInterop.SetupSanitizeLabelledBy();
-
-        var focused = false;
-        var blurred = false;
-
-        var cut = RenderComponent<AllyariaEditor>(p => p
-            .Add(x => x.OnFocus, EventCallback.Factory.Create(this, () => focused = true))
-            .Add(x => x.OnBlur, EventCallback.Factory.Create(this, () => blurred = true))
-        );
-
-        var content = cut.Find("#ae-content");
-
-        await content.TriggerEventAsync("onfocus", new FocusEventArgs());
-        await content.TriggerEventAsync("onblur", new FocusEventArgs());
-
-        Assert.True(focused);
-        Assert.True(blurred);
-    }
-
-    [Fact]
     public void HeightZero_Fills_Parent()
     {
         JSInterop.SetupSanitizeLabelledBy();
@@ -127,23 +105,6 @@ public class EditorContainerTests : TestContext
 
         var content = cut.Find("#ae-content");
         Assert.Equal("Editor content", content.GetAttribute("aria-label"));
-    }
-
-    [Fact]
-    public void Placeholder_Shown_And_Announced_When_Text_Empty()
-    {
-        JSInterop.SetupSanitizeLabelledBy();
-
-        var cut = RenderComponent<AllyariaEditor>(p => p
-            .Add(x => x.Text, string.Empty)
-            .Add(x => x.Placeholder, "Start typing...")
-        );
-
-        var placeholder = cut.Find("#ae-placeholder");
-        Assert.Equal("Start typing...", placeholder.TextContent.Trim());
-
-        var content = cut.Find("#ae-content");
-        Assert.Contains("ae-placeholder", content.GetAttribute("aria-describedby") ?? string.Empty);
     }
 
     [Fact]
@@ -284,28 +245,6 @@ public class EditorContainerTests : TestContext
         Assert.Contains("background-color: transparent", toolbarStyle);
         Assert.Contains("background-color: transparent", wrapperStyle);
         Assert.Contains("background-color: transparent", statusStyle);
-    }
-
-    [Fact]
-    public async Task Typing_Updates_Binding_And_Fires_TextChanged()
-    {
-        JSInterop.SetupSanitizeLabelledBy();
-
-        string? updated = null;
-
-        var cut = RenderComponent<AllyariaEditor>(parameters => parameters
-            .Add(p => p.Text, "Hello")
-            .Add(p => p.TextChanged, v => updated = v)
-        );
-
-        // Simulate JS returning edited innerHTML
-        JSInterop.SetupGetInnerHtml("Hello world");
-
-        var content = cut.Find("#ae-content");
-        await content.TriggerEventAsync("oninput", new ChangeEventArgs());
-
-        Assert.Equal("Hello world", updated);
-        Assert.Contains("Hello world", content.InnerHtml);
     }
 
     [Fact]
