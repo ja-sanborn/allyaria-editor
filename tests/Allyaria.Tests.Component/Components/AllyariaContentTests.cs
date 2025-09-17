@@ -68,7 +68,7 @@ public class AllyariaContentTests : TestContext
         var cut = RenderComponent<AllyariaContent>(ps =>
             {
                 ps.Add(p => p.Text, string.Empty);
-                ps.Add(p => p.Placeholder, "Type here...");
+                ps.Add(p => p.Placeholder, "ToolbarType here...");
                 ps.Add(p => p.ContentWrapperStyle, string.Empty);
                 ps.Add(p => p.ContentStyle, string.Empty);
                 ps.Add(p => p.PlaceholderStyle, string.Empty);
@@ -78,7 +78,7 @@ public class AllyariaContentTests : TestContext
         );
 
         var placeholder = cut.Find("#ae-placeholder");
-        Assert.Equal("Type here...", placeholder.TextContent);
+        Assert.Equal("ToolbarType here...", placeholder.TextContent);
         var content = cut.Find("#ae-content");
         Assert.Equal("ae-placeholder", content.GetAttribute("aria-describedby"));
     }

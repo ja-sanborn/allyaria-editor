@@ -9,7 +9,7 @@ namespace Allyaria.Editor.Components;
 
 /// <summary>
 /// Represents the toolbar/status host for the editor. This component renders either the primary toolbar region or the
-/// status region (depending on <see cref="Region" />), owns ARIA semantics for that region, and resolves any
+/// status region (depending on <see cref="ToolbarType" />), owns ARIA semantics for that region, and resolves any
 /// <c>aria-labelledby</c> references via JS interop.
 /// </summary>
 public partial class AllyariaToolbar : ComponentBase
@@ -39,13 +39,6 @@ public partial class AllyariaToolbar : ComponentBase
     public IEditorJsInterop JsInterop { get; set; } = null!;
 
     /// <summary>
-    /// Gets or sets which region this instance represents: <see cref="ToolbarRegion.Toolbar" /> or
-    /// <see cref="ToolbarRegion.Status" />. Defaults to <see cref="ToolbarRegion.Toolbar" />.
-    /// </summary>
-    [Parameter]
-    public ToolbarRegion Region { get; set; } = ToolbarRegion.Toolbar;
-
-    /// <summary>
     /// Gets or sets the inline style string for the status region (for example, background/foreground colors).
     /// </summary>
     [Parameter]
@@ -56,6 +49,13 @@ public partial class AllyariaToolbar : ComponentBase
     /// </summary>
     [Parameter]
     public string ToolbarStyle { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets which region this instance represents: <see cref="AeToolbarType.Toolbar" /> or
+    /// <see cref="AeToolbarType.Status" />. Defaults to <see cref="AeToolbarType.Toolbar" />.
+    /// </summary>
+    [Parameter]
+    public AeToolbarType ToolbarType { get; set; } = AeToolbarType.Toolbar;
 
     /// <summary>
     /// Builds ARIA attributes for the status region using precedence rules: 1) non-empty <c>aria-labelledby</c>, 2)
@@ -85,7 +85,7 @@ public partial class AllyariaToolbar : ComponentBase
         if (firstRender)
         {
             // Resolve labelled-by per region.
-            if (Region == ToolbarRegion.Toolbar)
+            if (ToolbarType == AeToolbarType.Toolbar)
             {
                 _toolbarLabelledByResolved = await SanitizeLabelledByAsync(AeLabels.ToolbarLabelledById);
             }

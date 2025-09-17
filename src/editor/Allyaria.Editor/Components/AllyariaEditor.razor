@@ -3,7 +3,7 @@
      role="group"
      @attributes="GetContainerAriaAttributes()">
     <CascadingValue Value="_aeContext" IsFixed="true">
-        <AllyariaToolbar Region="ToolbarRegion.Toolbar"
+        <AllyariaToolbar ToolbarType="AeToolbarType.Toolbar"
                          ToolbarStyle="@ToolbarStyle"
                          StatusStyle="@StatusStyle"
                          AeLabels="AeLabels"
@@ -21,7 +21,7 @@
                          OnBlur="@OnBlur"
                          JsInterop="@_interop"/>
 
-        <AllyariaToolbar Region="ToolbarRegion.Status"
+        <AllyariaToolbar ToolbarType="AeToolbarType.Status"
                          ToolbarStyle="@ToolbarStyle"
                          StatusStyle="@StatusStyle"
                          AeLabels="AeLabels"

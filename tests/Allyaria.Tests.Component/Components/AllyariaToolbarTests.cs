@@ -15,7 +15,7 @@ public class AllyariaToolbarTests : TestContext
 
         var cut = RenderComponent<AllyariaToolbar>(ps =>
             {
-                ps.Add(p => p.Region, ToolbarRegion.Status);
+                ps.Add(p => p.ToolbarType, AeToolbarType.Status);
                 ps.Add(p => p.AeLabels, new AeLabels());
                 ps.Add(p => p.ToolbarStyle, string.Empty);
                 ps.Add(p => p.StatusStyle, "background-color:blue;");
@@ -35,7 +35,7 @@ public class AllyariaToolbarTests : TestContext
 
         var cut = RenderComponent<AllyariaToolbar>(ps =>
             {
-                ps.Add(p => p.Region, ToolbarRegion.Toolbar);
+                ps.Add(p => p.ToolbarType, AeToolbarType.Toolbar);
                 ps.Add(p => p.AeLabels, new AeLabels());
                 ps.Add(p => p.ToolbarStyle, "background-color:red;");
                 ps.Add(p => p.StatusStyle, string.Empty);
