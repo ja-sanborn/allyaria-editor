@@ -4,6 +4,7 @@ using Allyaria.Editor.Helpers;
 using Allyaria.Editor.Resources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace Allyaria.Editor.Components;
 
@@ -53,6 +54,9 @@ public partial class AllyariaContent : ComponentBase
     /// <summary>Gets or sets the JS interop abstraction used by the component.</summary>
     [Parameter]
     public IEditorJsInterop JsInterop { get; set; } = null!;
+
+    [Inject]
+    internal IJSRuntime JsRuntime { get; set; } = null!;
 
     /// <summary>Gets or sets the callback invoked when the content region loses focus.</summary>
     [Parameter]
@@ -120,6 +124,18 @@ public partial class AllyariaContent : ComponentBase
     {
         if (firstRender)
         {
+            // Load component-scoped JS (ignore failures in non-browser/test environments).
+            try
+            {
+                await JsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/Allyaria.Editor/Components/AllyariaContent.razor.js"
+                );
+            }
+            catch
+            {
+                // No-op
+            }
+
             _contentLabelledByResolved = await SanitizeLabelledByAsync(AeLabels.ContentLabelledById);
 
             if (AutoFocus)

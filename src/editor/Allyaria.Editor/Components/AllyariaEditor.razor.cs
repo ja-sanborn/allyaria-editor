@@ -185,6 +185,18 @@ public partial class AllyariaEditor : ComponentBase
     {
         if (firstRender)
         {
+            // Load component-scoped JS (ignore failures in non-browser/test environments).
+            try
+            {
+                await JsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/Allyaria.Editor/Components/AllyariaEditor.razor.js"
+                );
+            }
+            catch
+            {
+                // No-op
+            }
+
             // Validate only the container here; children validate their own labelled-by.
             _containerLabelledByResolved = await SanitizeLabelledByAsync(AeLabels.ContainerLabelledById);
 

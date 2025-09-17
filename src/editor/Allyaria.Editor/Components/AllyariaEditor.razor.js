@@ -1,16 +1,6 @@
 ﻿"use strict";
 
-// Global interop helpers for Allyaria.Editor
-
-// Returns the element's innerHTML, used to capture contenteditable changes.
-window.Allyaria_Editor_getInnerHtml = function (element) {
-    try {
-        if (!element) return "";
-        return element.innerHTML ?? "";
-    } catch {
-        return "";
-    }
-};
+// Component-scoped interop for AllyariaEditor
 
 // Accepts a space-separated list of element IDs and returns a space-separated list
 // of IDs that exist and have non-empty trimmed textContent. Returns "" if none.
