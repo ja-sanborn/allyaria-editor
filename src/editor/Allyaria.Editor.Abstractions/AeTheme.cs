@@ -24,7 +24,7 @@
 /// <param name="OverlayColor">The appropriate overlay color for the theme style.</param>
 public readonly record struct AeTheme(
     AeThemeType ThemeType = AeThemeType.System,
-    bool Transparent = true,
+    bool Transparent = false,
     bool Outlined = true,
     string? BorderColor = null,
     string? BackgroundImage = null,

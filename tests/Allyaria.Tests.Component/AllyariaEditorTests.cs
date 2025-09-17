@@ -23,11 +23,7 @@ public class EditorContainerTests : TestContext
         // Arrange
         SetupSanitizer();
 
-        var theme = new AeTheme(
-            AeThemeType.Dark,
-            BackgroundImage: "paper.png"
-        );
-
+        var theme = new AeTheme(AeThemeType.Dark, BackgroundImage: "paper.png");
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
 
         // Act
@@ -52,11 +48,7 @@ public class EditorContainerTests : TestContext
         // Arrange
         SetupSanitizer();
 
-        var theme = new AeTheme(
-            AeThemeType.Light,
-            ContentBackground: "#ffeeee"
-        );
-
+        var theme = new AeTheme(AeThemeType.Light, ContentBackground: "#ffeeee");
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
 
         // Act
@@ -269,11 +261,7 @@ public class EditorContainerTests : TestContext
         // Arrange
         SetupSanitizer();
 
-        var theme = new AeTheme(
-            AeThemeType.Light,
-            BackgroundImage: "paper.png" // should be ignored when Transparent
-        );
-
+        var theme = new AeTheme(AeThemeType.Light, true, BackgroundImage: "paper.png");
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Theme, theme));
 
         // Act
