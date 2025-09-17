@@ -12,22 +12,19 @@ namespace Allyaria.Editor.Components;
 /// </summary>
 public partial class EditorContainer : ComponentBase
 {
-    /// <summary>The sanitized space-separated ID list for the container's <c>aria-labeledby</c> attribute.</summary>
+    /// <summary>The sanitized space-separated ID list for the container's <c>aria-labelledby</c> attribute.</summary>
     private string _containerLabelledByResolved = string.Empty;
 
-    /// <summary>The sanitized space-separated ID list for the content's <c>aria-labeledby</c> attribute.</summary>
+    /// <summary>The sanitized space-separated ID list for the content's <c>aria-labelledby</c> attribute.</summary>
     private string _contentLabelledByResolved = string.Empty;
 
     /// <summary>A reference to the content element for focus management and interop.</summary>
     private ElementReference _contentRef;
 
-    /// <summary>Indicates whether the <c>aria-labeledby</c> validation step has executed.</summary>
-    private bool _labelsValidated;
-
-    /// <summary>The sanitized space-separated ID list for the status region's <c>aria-labeledby</c> attribute.</summary>
+    /// <summary>The sanitized space-separated ID list for the status region's <c>aria-labelledby</c> attribute.</summary>
     private string _statusLabelledByResolved = string.Empty;
 
-    /// <summary>The sanitized space-separated ID list for the toolbar's <c>aria-labeledby</c> attribute.</summary>
+    /// <summary>The sanitized space-separated ID list for the toolbar's <c>aria-labelledby</c> attribute.</summary>
     private string _toolbarLabelledByResolved = string.Empty;
 
     /// <summary>Gets or sets a value indicating whether the content area should receive focus on the first render.</summary>
@@ -86,23 +83,23 @@ public partial class EditorContainer : ComponentBase
     public int Width { get; set; } = 400;
 
     /// <summary>Builds the appropriate ARIA attributes following the precedence rules.</summary>
-    /// <param name="labeledByResolved">A sanitized list of labeled-by IDs (can be empty).</param>
+    /// <param name="labelledByResolved">A sanitized list of labeled-by IDs (can be empty).</param>
     /// <param name="overrideLabel">An optional override label value.</param>
     /// <param name="fallback">The fallback label when neither labeled-by nor override applies.</param>
     /// <returns>An attribute dictionary with either <c>aria-labeledby</c> or <c>aria-label</c>.</returns>
-    private IReadOnlyDictionary<string, object> BuildAriaAttributes(string labeledByResolved,
+    private static IReadOnlyDictionary<string, object> BuildAriaAttributes(string labelledByResolved,
         string? overrideLabel,
         string fallback)
     {
         // Precedence:
-        // 1) valid aria-labeledby (non-empty sanitized id list)
+        // 1) valid aria-labelledby (non-empty sanitized id list)
         // 2) non-whitespace override string via aria-label
         // 3) fallback to .resx default via aria-label
-        if (_labelsValidated && !string.IsNullOrWhiteSpace(labeledByResolved))
+        if (!string.IsNullOrWhiteSpace(labelledByResolved))
         {
             return new Dictionary<string, object>
             {
-                ["aria-labeledby"] = labeledByResolved
+                ["aria-labelledby"] = labelledByResolved
             };
         }
 
@@ -240,7 +237,7 @@ public partial class EditorContainer : ComponentBase
         }
     }
 
-    /// <summary>Validates the <c>aria-labeledby</c> IDs for all regions and updates internal state.</summary>
+    /// <summary>Validates the <c>aria-labelledby</c> IDs for all regions and updates internal state.</summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task ValidateLabelledByAsync()
     {
@@ -248,7 +245,6 @@ public partial class EditorContainer : ComponentBase
         _toolbarLabelledByResolved = await SanitizeLabelledByAsync(Labels.ToolbarLabelledById);
         _contentLabelledByResolved = await SanitizeLabelledByAsync(Labels.ContentLabelledById);
         _statusLabelledByResolved = await SanitizeLabelledByAsync(Labels.StatusLabelledById);
-        _labelsValidated = true;
         StateHasChanged();
     }
 }
