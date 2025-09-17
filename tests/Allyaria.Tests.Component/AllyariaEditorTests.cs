@@ -70,7 +70,7 @@ public class EditorContainerTests : TestContext
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(
-                x => x.Labels, new AllyariaLabels(ContentLabelledById: "badId")
+                x => x.AeLabels, new AeLabels(ContentLabelledById: "badId")
             )
         );
 
@@ -162,7 +162,7 @@ public class EditorContainerTests : TestContext
             .SetResult("heading1");
 
         var cut = RenderComponent<AllyariaEditor>(p =>
-            p.Add(x => x.Labels, new AllyariaLabels(ContentLabelledById: "heading1"))
+            p.Add(x => x.AeLabels, new AeLabels(ContentLabelledById: "heading1"))
         );
 
         var content = cut.Find("#ae-content");
@@ -175,7 +175,7 @@ public class EditorContainerTests : TestContext
     {
         JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult(string.Empty);
 
-        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.Labels, new AllyariaLabels("   ")));
+        var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.AeLabels, new AeLabels("   ")));
         var container = cut.Find("div.ae-editor");
 
         Assert.Equal("Editor", container.GetAttribute("aria-label"));

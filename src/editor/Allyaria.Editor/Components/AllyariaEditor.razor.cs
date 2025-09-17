@@ -40,15 +40,19 @@ public partial class AllyariaEditor : ComponentBase
     private string _statusStyle = string.Empty;
 
     /// <summary>
-    /// The theme detected from the host system when <see cref="AllyariaTheme.Theme" /> is <see cref="ThemeType.System" />.
+    /// The ThemeType detected from the host system when <see cref="AeTheme.ThemeType" /> is <see cref="AeThemeType.System" />.
     /// </summary>
-    private ThemeType? _systemThemeDetected;
+    private AeThemeType? _systemThemeDetected;
 
     /// <summary>The sanitized space-separated ID list for the toolbar's <c>aria-labelledby</c> attribute.</summary>
     private string _toolbarLabelledByResolved = string.Empty;
 
     /// <summary>The computed toolbar inline style string.</summary>
     private string _toolbarStyle = string.Empty;
+
+    /// <summary>Gets or sets ARIA label overrides and labeled-by IDs.</summary>
+    [Parameter]
+    public AeLabels AeLabels { get; set; }
 
     /// <summary>Gets or sets a value indicating whether the content area should receive focus on the first render.</summary>
     [Parameter]
@@ -76,10 +80,6 @@ public partial class AllyariaEditor : ComponentBase
     /// <summary>Gets or sets the JavaScript interop service used by the component.</summary>
     [Inject]
     internal IJSRuntime JsRuntime { get; set; } = null!;
-
-    /// <summary>Gets or sets ARIA label overrides and labeled-by IDs.</summary>
-    [Parameter]
-    public AllyariaLabels Labels { get; set; }
 
     /// <summary>Occurs when the content region loses focus.</summary>
     [Parameter]
@@ -112,9 +112,9 @@ public partial class AllyariaEditor : ComponentBase
     [Parameter]
     public EventCallback<string> TextChanged { get; set; }
 
-    /// <summary>Exposes runtime theme configuration. Defaults to System (automatic) behavior.</summary>
+    /// <summary>Exposes runtime ThemeType configuration. Defaults to System (automatic) behavior.</summary>
     [Parameter]
-    public AllyariaTheme Theme { get; set; }
+    public AeTheme Theme { get; set; }
 
     /// <summary>Computes the toolbar region style.</summary>
     private string ToolbarStyle => _toolbarStyle;
@@ -163,20 +163,20 @@ public partial class AllyariaEditor : ComponentBase
     /// <summary>Builds ARIA attributes for the editor container region.</summary>
     /// <returns>An attribute dictionary to be applied to the container element.</returns>
     private IReadOnlyDictionary<string, object> GetContainerAriaAttributes()
-        => BuildAriaAttributes(_containerLabelledByResolved, Labels.Container, EditorResources.EditorLabel);
+        => BuildAriaAttributes(_containerLabelledByResolved, AeLabels.Container, EditorResources.EditorLabel);
 
     /// <summary>Builds ARIA attributes for the content region.</summary>
     /// <returns>An attribute dictionary to be applied to the content element.</returns>
     private IReadOnlyDictionary<string, object> GetContentAriaAttributes()
-        => BuildAriaAttributes(_contentLabelledByResolved, Labels.Content, EditorResources.EditorContentLabel);
+        => BuildAriaAttributes(_contentLabelledByResolved, AeLabels.Content, EditorResources.EditorContentLabel);
 
-    /// <summary>Returns default theme values for the specified <see cref="ThemeType" />.</summary>
-    /// <param name="theme">The theme type to resolve.</param>
-    /// <returns>An <see cref="AllyariaTheme" /> carrying default colors and overlay.</returns>
-    private static AllyariaTheme GetDefaults(ThemeType theme)
-        => theme switch
+    /// <summary>Returns default themeType values for the specified <see cref="AeThemeType" />.</summary>
+    /// <param name="themeType">The themeType type to resolve.</param>
+    /// <returns>An <see cref="AeTheme" /> carrying default colors and overlay.</returns>
+    private static AeTheme GetDefaults(AeThemeType themeType)
+        => themeType switch
         {
-            ThemeType.Dark => new AllyariaTheme(
+            AeThemeType.Dark => new AeTheme(
                 ToolbarBackground: "#161b22",
                 ContentBackground: "#0f1115",
                 StatusBackground: "#161b22",
@@ -187,7 +187,7 @@ public partial class AllyariaEditor : ComponentBase
                 CaretColor: "#e7e9ee",
                 OverlayColor: "rgba(0,0,0,0.5)"
             ),
-            ThemeType.HighContrast => new AllyariaTheme(
+            AeThemeType.HighContrast => new AeTheme(
                 ToolbarBackground: "#000000",
                 ContentBackground: "#000000",
                 StatusBackground: "#000000",
@@ -198,7 +198,7 @@ public partial class AllyariaEditor : ComponentBase
                 CaretColor: "#ffffff",
                 OverlayColor: "rgba(255,255,255,0.5)"
             ),
-            _ => new AllyariaTheme( // Light
+            _ => new AeTheme( // Light
                 ToolbarBackground: "#f6f8fa",
                 ContentBackground: "#ffffff",
                 StatusBackground: "#f6f8fa",
@@ -214,12 +214,12 @@ public partial class AllyariaEditor : ComponentBase
     /// <summary>Builds ARIA attributes for the status region.</summary>
     /// <returns>An attribute dictionary to be applied to the status element.</returns>
     private IReadOnlyDictionary<string, object> GetStatusAriaAttributes()
-        => BuildAriaAttributes(_statusLabelledByResolved, Labels.Status, EditorResources.EditorStatusLabel);
+        => BuildAriaAttributes(_statusLabelledByResolved, AeLabels.Status, EditorResources.EditorStatusLabel);
 
     /// <summary>Builds ARIA attributes for the toolbar region.</summary>
     /// <returns>An attribute dictionary to be applied to the toolbar element.</returns>
     private IReadOnlyDictionary<string, object> GetToolbarAriaAttributes()
-        => BuildAriaAttributes(_toolbarLabelledByResolved, Labels.Toolbar, EditorResources.EditorToolbarLabel);
+        => BuildAriaAttributes(_toolbarLabelledByResolved, AeLabels.Toolbar, EditorResources.EditorToolbarLabel);
 
     /// <summary>Handles the blur event for the content region.</summary>
     /// <param name="_">The focus event arguments (unused).</param>
@@ -253,7 +253,7 @@ public partial class AllyariaEditor : ComponentBase
             await ValidateLabelledByAsync();
 
             // Detect system theme if requested.
-            if (Theme.Theme == ThemeType.System)
+            if (Theme.ThemeType == AeThemeType.System)
             {
                 try
                 {
@@ -261,14 +261,14 @@ public partial class AllyariaEditor : ComponentBase
 
                     _systemThemeDetected = result switch
                     {
-                        "hc" => ThemeType.HighContrast,
-                        "dark" => ThemeType.Dark,
-                        _ => ThemeType.Light
+                        "hc" => AeThemeType.HighContrast,
+                        "dark" => AeThemeType.Dark,
+                        _ => AeThemeType.Light
                     };
                 }
                 catch
                 {
-                    _systemThemeDetected = ThemeType.Light;
+                    _systemThemeDetected = AeThemeType.Light;
                 }
 
                 RecomputeStyles(_systemThemeDetected!.Value);
@@ -321,9 +321,9 @@ public partial class AllyariaEditor : ComponentBase
     /// <summary>Computes the theme and styles whenever parameters change.</summary>
     protected override void OnParametersSet()
     {
-        var effective = Theme.Theme == ThemeType.System && _systemThemeDetected.HasValue
+        var effective = Theme.ThemeType == AeThemeType.System && _systemThemeDetected.HasValue
             ? _systemThemeDetected.Value
-            : Theme.Theme;
+            : Theme.ThemeType;
 
         RecomputeStyles(effective);
         base.OnParametersSet();
@@ -331,7 +331,7 @@ public partial class AllyariaEditor : ComponentBase
 
     /// <summary>Recomputes all region styles based on the effective theme and current parameters.</summary>
     /// <param name="effectiveTheme">The resolved theme used for defaults.</param>
-    private void RecomputeStyles(ThemeType effectiveTheme)
+    private void RecomputeStyles(AeThemeType effectiveTheme)
     {
         var defaults = GetDefaults(effectiveTheme);
 
@@ -341,7 +341,7 @@ public partial class AllyariaEditor : ComponentBase
         var statusFg = DefaultOrOverride(Theme.StatusForeground, defaults.StatusForeground!);
         var caret = DefaultOrOverride(Theme.CaretColor, defaults.CaretColor!);
 
-        // Background precedence: Image > Color > Theme > Fallback; Transparent clears and ignores image.
+        // Background precedence: Image > Color > AeTheme > Fallback; Transparent clears and ignores image.
         var transparent = Theme.Transparent;
         var hasImage = !transparent && !string.IsNullOrWhiteSpace(Theme.BackgroundImage);
 
@@ -373,7 +373,7 @@ public partial class AllyariaEditor : ComponentBase
                     ? defaults.StatusBackground
                     : Theme.StatusBackground!.Trim();
 
-        // Border: Specified > Theme > Fallback; if not outlined, no border.
+        // Border: Specified > AeTheme > Fallback; if not outlined, no border.
         var outlined = Theme.Outlined;
 
         var borderColor = string.IsNullOrWhiteSpace(Theme.BorderColor)
@@ -432,10 +432,10 @@ public partial class AllyariaEditor : ComponentBase
     /// <summary>Validates the <c>aria-labelledby</c> IDs for all regions and updates internal state.</summary>
     private async Task ValidateLabelledByAsync()
     {
-        _containerLabelledByResolved = await SanitizeLabelledByAsync(Labels.ContainerLabelledById);
-        _toolbarLabelledByResolved = await SanitizeLabelledByAsync(Labels.ToolbarLabelledById);
-        _contentLabelledByResolved = await SanitizeLabelledByAsync(Labels.ContentLabelledById);
-        _statusLabelledByResolved = await SanitizeLabelledByAsync(Labels.StatusLabelledById);
+        _containerLabelledByResolved = await SanitizeLabelledByAsync(AeLabels.ContainerLabelledById);
+        _toolbarLabelledByResolved = await SanitizeLabelledByAsync(AeLabels.ToolbarLabelledById);
+        _contentLabelledByResolved = await SanitizeLabelledByAsync(AeLabels.ContentLabelledById);
+        _statusLabelledByResolved = await SanitizeLabelledByAsync(AeLabels.StatusLabelledById);
         StateHasChanged();
     }
 }

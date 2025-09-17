@@ -29,7 +29,7 @@
 /// Space-separated element IDs providing the accessible name for the status region via <c>aria-labelledby</c>. If the IDs
 /// are invalid or resolve to empty texts, the component falls back to an <c>aria-label</c>.
 /// </param>
-public readonly record struct AllyariaLabels(
+public readonly record struct AeLabels(
     string? Container = null,
     string? Toolbar = null,
     string? Content = null,
