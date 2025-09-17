@@ -47,7 +47,7 @@ public partial class AllyariaEditor : ComponentBase
 
     /// <summary>Gets or sets ARIA label overrides and labeled-by IDs.</summary>
     [Parameter]
-    public AriaLabels Labels { get; set; }
+    public AllyariaLabels Labels { get; set; }
 
     /// <summary>Occurs when the content region loses focus.</summary>
     [Parameter]
