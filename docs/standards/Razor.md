@@ -1,6 +1,9 @@
 # Razor Coding Standards (Blazor-focused)
 
-These standards define how we write Razor component files (`.razor`) in this project. Razor files should contain **markup and lightweight binding only**. All C# logic belongs in a **code-behind** partial class (`.razor.cs`). **No inline `<script>` or `<style>`** in Razor files—JavaScript and styles must be **referenced** (via JS modules and SCSS/CSS files), not embedded.
+These standards define how we write Razor component files (`.razor`) in this project. Razor files should contain *
+*markup and lightweight binding only**. All C# logic belongs in a **code-behind** partial class (`.razor.cs`). **No
+inline `<script>` or `<style>`** in Razor files—JavaScript and styles must be **referenced** (via JS modules and
+SCSS/CSS files), not embedded.
 
 > *Last updated: 2025-09-12*
 
@@ -21,7 +24,8 @@ These standards define how we write Razor component files (`.razor`) in this pro
 * Trim trailing whitespace: **yes**
 * Indentation: **4 spaces** (no tabs)
 
-> Rationale: Matches common cross-platform tooling defaults, ensures clean diffs, and consistent formatting across editors/IDEs.
+> Rationale: Matches common cross-platform tooling defaults, ensures clean diffs, and consistent formatting across
+> editors/IDEs.
 
 ## 3. Parameters, State, and Naming
 
@@ -41,7 +45,8 @@ These standards define how we write Razor component files (`.razor`) in this pro
 
 ## 5. Events, Callbacks, and Binding
 
-* Use `EventCallback`/`EventCallback<T>` for parameters that represent events; don’t expose `Action`/`Func` from components.
+* Use `EventCallback`/`EventCallback<T>` for parameters that represent events; don’t expose `Action`/`Func` from
+  components.
 * Avoid large inline lambdas in Razor that capture significant closure state; prefer small method groups in code-behind.
 * Keep bindings explicit and minimal; prefer `@bind-Value:event="oninput"` only when real-time updates are required.
 
@@ -59,7 +64,8 @@ These standards define how we write Razor component files (`.razor`) in this pro
 
 ## 8. JavaScript Interop (Reference Only—no inline scripts)
 
-* Do not embed scripts in `.razor`. Use **ES modules** under `wwwroot/js/` and import via `IJSRuntime/IJSObjectReference`.
+* Do not embed scripts in `.razor`. Use **ES modules** under `wwwroot/js/` and import via
+  `IJSRuntime/IJSObjectReference`.
 * Keep JS minimal and focused (see JS standards). Always provide a **dispose** path for event listeners/observers.
 * Pass `ElementReference` from Razor to JS instead of global queries.
 
@@ -93,4 +99,5 @@ These standards define how we write Razor component files (`.razor`) in this pro
 
 ## 15. Deviations
 
-If a guideline must be violated (interop constraints, performance, third-party markup), document the rationale in comments near the code and in the PR description, and keep the deviation as small and localized as possible.
+If a guideline must be violated (interop constraints, performance, third-party markup), document the rationale in
+comments near the code and in the PR description, and keep the deviation as small and localized as possible.

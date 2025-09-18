@@ -1,0 +1,23 @@
+﻿.ae-content-wrapper {
+    position: relative;
+    flex: 1 1 auto;
+}
+
+.ae-content {
+    outline: none;
+    padding: var(--ae-spacing);
+    min-height: 100px;
+    height: 100%;
+    overflow: hidden; /* overflow behavior out of scope for this story */
+    white-space: pre-wrap;
+}
+
+.ae-placeholder {
+    position: absolute;
+    top: var(--ae-spacing);
+    left: var(--ae-spacing);
+    right: var(--ae-spacing);
+    color: #8c959f;
+    pointer-events: none;
+    user-select: none;
+}

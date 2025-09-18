@@ -1,53 +1,84 @@
-﻿using Allyaria.Editor.Abstractions;
+﻿using Allyaria.Editor.Abstractions.Interfaces;
+using Allyaria.Editor.Abstractions.Models;
+using Allyaria.Editor.Abstractions.Types;
+using Allyaria.Editor.Helpers;
 using Allyaria.Editor.Resources;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace Allyaria.Editor.Components;
 
 /// <summary>
-/// A core editor container that renders toolbar, content, and status regions with sizing, accessibility, localization, and
-/// theming hooks.
+/// Core editor container that composes toolbars, content, and status regions; computes sizing, accessibility,
+/// localization, and theming hooks, and cascades an <see cref="AeContext" /> to children.
 /// </summary>
 public partial class AllyariaEditor : ComponentBase
 {
+    /// <summary>The effective editor context (theme + resolved theme type) that is cascaded to child components.</summary>
+    private AeContext _aeContext;
+
     /// <summary>The sanitized space-separated ID list for the container's <c>aria-labelledby</c> attribute.</summary>
     private string _containerLabelledByResolved = string.Empty;
 
-    /// <summary>The sanitized space-separated ID list for the content's <c>aria-labelledby</c> attribute.</summary>
-    private string _contentLabelledByResolved = string.Empty;
+    /// <summary>The computed inline style string for the container element.</summary>
+    private string _containerStyle = string.Empty;
 
-    /// <summary>A reference to the content element for focus management and interop.</summary>
-    private ElementReference _contentRef;
+    /// <summary>The computed inline style string for the content element.</summary>
+    private string _contentStyle = string.Empty;
 
-    /// <summary>The sanitized space-separated ID list for the status region's <c>aria-labelledby</c> attribute.</summary>
-    private string _statusLabelledByResolved = string.Empty;
+    /// <summary>The computed inline style string for the content wrapper element.</summary>
+    private string _contentWrapperStyle = string.Empty;
 
-    /// <summary>The sanitized space-separated ID list for the toolbar's <c>aria-labelledby</c> attribute.</summary>
-    private string _toolbarLabelledByResolved = string.Empty;
+    /// <summary>
+    /// Optional override for the JS-interop implementation; lazily initialized to the default if not supplied.
+    /// </summary>
+    private IEditorJsInterop? _interop;
+
+    /// <summary>The computed inline style string for the placeholder element.</summary>
+    private string _placeholderStyle = string.Empty;
+
+    /// <summary>The computed inline style string for the status element.</summary>
+    private string _statusStyle = string.Empty;
+
+    /// <summary>
+    /// The system theme that was detected (only when the public theme is <see cref="AeThemeType.System" />).
+    /// </summary>
+    private AeThemeType? _systemThemeDetected;
+
+    /// <summary>The computed inline style string for the toolbar element.</summary>
+    private string _toolbarStyle = string.Empty;
+
+    /// <summary>Gets or sets ARIA label overrides and labeled-by IDs.</summary>
+    [Parameter]
+    public AeLabels AeLabels { get; set; }
 
     /// <summary>Gets or sets a value indicating whether the content area should receive focus on the first render.</summary>
     [Parameter]
     public bool AutoFocus { get; set; }
 
-    /// <summary>Gets the ID of the placeholder for <c>aria-describedby</c> when the placeholder is visible.</summary>
-    private string? ContentDescribedBy
-        => ShowPlaceholder
-            ? "ae-placeholder"
-            : null;
+    /// <summary>Gets the computed container inline style (size, border, and any image overlay).</summary>
+    private string ContainerStyle => _containerStyle;
+
+    /// <summary>Gets the computed content inline style (foreground and caret color).</summary>
+    private string ContentStyle => _contentStyle;
+
+    /// <summary>Gets the computed content wrapper inline style (background color).</summary>
+    private string ContentWrapperStyle => _contentWrapperStyle;
 
     /// <summary>Gets or sets the height in pixels; 0 means 100% height of the parent. Default is 300.</summary>
     [Parameter]
     public int Height { get; set; } = 300;
 
-    /// <summary>Gets or sets the JavaScript interop service used by the component.</summary>
+    /// <summary>
+    /// Optional override for the JS interop implementation (useful for testing). If not supplied, a default implementation
+    /// will be created using <see cref="JsRuntime" />.
+    /// </summary>
+    [Parameter]
+    public IEditorJsInterop? JsInterop { get; set; }
+
+    /// <summary>Gets or sets the JavaScript runtime from DI used by the default interop implementation.</summary>
     [Inject]
     internal IJSRuntime JsRuntime { get; set; } = null!;
-
-    /// <summary>Gets or sets ARIA label overrides and labeled-by IDs.</summary>
-    [Parameter]
-    public AriaLabels Labels { get; set; }
 
     /// <summary>Occurs when the content region loses focus.</summary>
     [Parameter]
@@ -63,12 +94,11 @@ public partial class AllyariaEditor : ComponentBase
     [Parameter]
     public string? Placeholder { get; set; }
 
-    /// <summary>Gets a value indicating whether the placeholder should be shown.</summary>
-    private bool ShowPlaceholder => !string.IsNullOrEmpty(Placeholder) && string.IsNullOrEmpty(Text);
+    /// <summary>Gets the computed placeholder inline style.</summary>
+    private string PlaceholderStyle => _placeholderStyle;
 
-    /// <summary>Computes the width and height inline styles based on the component parameters.</summary>
-    private string Style
-        => $"width: {(Width == 0 ? "100%" : $"{Width}px")}; height: {(Height == 0 ? "100%" : $"{Height}px")};";
+    /// <summary>Gets the computed status inline style.</summary>
+    private string StatusStyle => _statusStyle;
 
     /// <summary>Gets or sets the bound HTML/text content. Two-way binding is supported via <c>bind-Text</c>.</summary>
     [Parameter]
@@ -78,140 +108,209 @@ public partial class AllyariaEditor : ComponentBase
     [Parameter]
     public EventCallback<string> TextChanged { get; set; }
 
+    /// <summary>
+    /// Exposes runtime theme configuration. Defaults to <see cref="AeThemeType.System" /> (automatic) behavior.
+    /// </summary>
+    [Parameter]
+    public AeTheme Theme { get; set; }
+
+    /// <summary>Gets the computed toolbar inline style.</summary>
+    private string ToolbarStyle => _toolbarStyle;
+
     /// <summary>Gets or sets the width in pixels; 0 means 100% width of the parent. Default is 400.</summary>
     [Parameter]
     public int Width { get; set; } = 400;
 
-    /// <summary>Builds the appropriate ARIA attributes following the precedence rules.</summary>
-    /// <param name="labelledByResolved">A sanitized list of labeled-by IDs (can be empty).</param>
-    /// <param name="overrideLabel">An optional override label value.</param>
-    /// <param name="fallback">The fallback label when neither labeled-by nor override applies.</param>
-    /// <returns>An attribute dictionary with either <c>aria-labeledby</c> or <c>aria-label</c>.</returns>
-    private static IReadOnlyDictionary<string, object> BuildAriaAttributes(string labelledByResolved,
-        string? overrideLabel,
-        string fallback)
-    {
-        // Precedence:
-        // 1) valid aria-labelledby (non-empty sanitized id list)
-        // 2) non-whitespace override string via aria-label
-        // 3) fallback to .resx default via aria-label
-        if (!string.IsNullOrWhiteSpace(labelledByResolved))
-        {
-            return new Dictionary<string, object>
-            {
-                ["aria-labelledby"] = labelledByResolved
-            };
-        }
+    /// <summary>Ensures a JS interop implementation is available, creating the default one if none was provided.</summary>
+    /// <returns>The interop instance to use.</returns>
+    private IEditorJsInterop EnsureInterop() => _interop ??= JsInterop ?? new EditorJsInterop(JsRuntime);
 
-        var label = DefaultOrOverride(overrideLabel, fallback);
-
-        return new Dictionary<string, object>
-        {
-            ["aria-label"] = label
-        };
-    }
-
-    /// <summary>Returns either the provided non-whitespace value or the specified fallback.</summary>
-    /// <param name="value">The override value to prefer, if present and non-whitespace.</param>
-    /// <param name="fallback">The fallback to use when <paramref name="value" /> is null or whitespace.</param>
-    /// <returns>The chosen non-empty string.</returns>
-    private static string DefaultOrOverride(string? value, string fallback)
-        => string.IsNullOrWhiteSpace(value)
-            ? fallback
-            : value.Trim();
-
-    /// <summary>Builds ARIA attributes for the editor container region.</summary>
-    /// <returns>An attribute dictionary to be applied to the container element.</returns>
+    /// <summary>
+    /// Builds ARIA attributes for the editor container using precedence rules: 1) non-empty <c>aria-labelledby</c>, 2)
+    /// non-whitespace override via <c>aria-label</c>, 3) fallback via <c>aria-label</c>.
+    /// </summary>
+    /// <returns>An attribute dictionary containing either <c>aria-labelledby</c> or <c>aria-label</c>.</returns>
     private IReadOnlyDictionary<string, object> GetContainerAriaAttributes()
-        => BuildAriaAttributes(_containerLabelledByResolved, Labels.Container, EditorResources.EditorLabel);
+        => EditorUtils.BuildAriaAttributes(
+            _containerLabelledByResolved, AeLabels.Container, EditorResources.EditorLabel
+        );
 
-    /// <summary>Builds ARIA attributes for the content region.</summary>
-    /// <returns>An attribute dictionary to be applied to the content element.</returns>
-    private IReadOnlyDictionary<string, object> GetContentAriaAttributes()
-        => BuildAriaAttributes(_contentLabelledByResolved, Labels.Content, EditorResources.EditorContentLabel);
-
-    /// <summary>Builds ARIA attributes for the status region.</summary>
-    /// <returns>An attribute dictionary to be applied to the status element.</returns>
-    private IReadOnlyDictionary<string, object> GetStatusAriaAttributes()
-        => BuildAriaAttributes(_statusLabelledByResolved, Labels.Status, EditorResources.EditorStatusLabel);
-
-    /// <summary>Builds ARIA attributes for the toolbar region.</summary>
-    /// <returns>An attribute dictionary to be applied to the toolbar element.</returns>
-    private IReadOnlyDictionary<string, object> GetToolbarAriaAttributes()
-        => BuildAriaAttributes(_toolbarLabelledByResolved, Labels.Toolbar, EditorResources.EditorToolbarLabel);
-
-    /// <summary>Handles the blur event for the content region.</summary>
-    /// <param name="_">The focus event arguments (unused).</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    private async Task HandleBlurAsync(FocusEventArgs _)
-    {
-        if (OnBlur.HasDelegate)
+    /// <summary>Returns default theme values for the specified theme type.</summary>
+    /// <param name="themeType">The theme type to resolve.</param>
+    /// <returns>An <see cref="AeTheme" /> carrying default colors and overlay.</returns>
+    private static AeTheme GetDefaults(AeThemeType themeType)
+        => themeType switch
         {
-            await OnBlur.InvokeAsync();
-        }
-    }
+            AeThemeType.Dark => new AeTheme(
+                ToolbarBackground: "#161b22",
+                ContentBackground: "#0f1115",
+                StatusBackground: "#161b22",
+                ToolbarForeground: "#e7e9ee",
+                ContentForeground: "#e7e9ee",
+                StatusForeground: "#e7e9ee",
+                BorderColor: "#30363d",
+                CaretColor: "#e7e9ee",
+                OverlayColor: "rgba(0,0,0,0.5)"
+            ),
+            AeThemeType.HighContrast => new AeTheme(
+                ToolbarBackground: "#000000",
+                ContentBackground: "#000000",
+                StatusBackground: "#000000",
+                ToolbarForeground: "#ffffff",
+                ContentForeground: "#ffffff",
+                StatusForeground: "#ffffff",
+                BorderColor: "#ffffff",
+                CaretColor: "#ffffff",
+                OverlayColor: "rgba(255,255,255,0.5)"
+            ),
+            _ => new AeTheme( // Light
+                ToolbarBackground: "#f6f8fa",
+                ContentBackground: "#ffffff",
+                StatusBackground: "#f6f8fa",
+                ToolbarForeground: "#24292f",
+                ContentForeground: "#24292f",
+                StatusForeground: "#24292f",
+                BorderColor: "#d0d7de",
+                CaretColor: "#24292f",
+                OverlayColor: "rgba(255,255,255,0.5)"
+            )
+        };
 
-    /// <summary>Handles the focus event for the content region.</summary>
-    /// <param name="_">The focus event arguments (unused).</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    private async Task HandleFocusAsync(FocusEventArgs _)
-    {
-        if (OnFocus.HasDelegate)
-        {
-            await OnFocus.InvokeAsync();
-        }
-    }
-
-    /// <summary>Executes post-render logic, including labeled-by sanitization and optional autofocus behavior.</summary>
+    /// <summary>
+    /// Executes post-render logic including container <c>aria-labelledby</c> sanitization and optional system theme detection.
+    /// </summary>
     /// <param name="firstRender">True if this is the first render; otherwise, false.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <returns>A task representing the asynchronous operation.</returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await ValidateLabelledByAsync();
+            // Load component-scoped JS (ignore failures in non-browser/test environments).
+            try
+            {
+                await JsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/Allyaria.Editor/Components/AllyariaEditor.razor.js"
+                );
+            }
+            catch
+            {
+                // No-op
+            }
 
-            if (AutoFocus)
+            // Validate only the container here; children validate their own labelled-by.
+            _containerLabelledByResolved = await SanitizeLabelledByAsync(AeLabels.ContainerLabelledById);
+
+            // Detect system theme if requested.
+            if (Theme.ThemeType == AeThemeType.System)
             {
                 try
                 {
-                    await _contentRef.FocusAsync();
+                    var result = await EnsureInterop().DetectSystemThemeAsync();
+
+                    _systemThemeDetected = result switch
+                    {
+                        "hc" => AeThemeType.HighContrast,
+                        "dark" => AeThemeType.Dark,
+                        _ => AeThemeType.Light
+                    };
                 }
                 catch
                 {
-                    // Ignore focus errors in non-browser/test environments
+                    _systemThemeDetected = AeThemeType.Light;
                 }
+
+                RecomputeStyles(_systemThemeDetected!.Value);
+                StateHasChanged();
             }
         }
     }
 
-    /// <summary>Handles the content input event and updates the bound <see cref="Text" /> value.</summary>
-    /// <param name="_">The change event arguments (unused).</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    private async Task OnInputAsync(ChangeEventArgs _)
+    /// <summary>
+    /// Computes the effective theme, updates computed styles, and refreshes the cascaded <see cref="AeContext" />.
+    /// </summary>
+    protected override void OnParametersSet()
     {
-        string newHtml;
+        // Lazy-init interop (allow override by parameter for unit tests)
+        _interop ??= JsInterop ?? new EditorJsInterop(JsRuntime);
 
-        try
-        {
-            newHtml = await JsRuntime.InvokeAsync<string>("Allyaria_Editor_getInnerHtml", _contentRef);
-        }
-        catch
-        {
-            newHtml = Text; // best effort in environments without JS
-        }
+        var effective = Theme.ThemeType == AeThemeType.System && _systemThemeDetected.HasValue
+            ? _systemThemeDetected.Value
+            : Theme.ThemeType;
 
-        if (!string.Equals(newHtml, Text, StringComparison.Ordinal))
-        {
-            Text = newHtml;
+        RecomputeStyles(effective);
 
-            if (TextChanged.HasDelegate)
-            {
-                await TextChanged.InvokeAsync(Text);
-            }
+        // Cascade minimal theming info (can be expanded in the future)
+        _aeContext = new AeContext(Theme, effective);
 
-            StateHasChanged();
-        }
+        base.OnParametersSet();
+    }
+
+    /// <summary>Recomputes all region styles based on the effective theme and current parameters.</summary>
+    /// <param name="effectiveTheme">The resolved theme used for defaults.</param>
+    private void RecomputeStyles(AeThemeType effectiveTheme)
+    {
+        var defaults = GetDefaults(effectiveTheme);
+
+        // Foreground/caret.
+        var toolbarFg = EditorUtils.DefaultOrOverride(Theme.ToolbarForeground, defaults.ToolbarForeground!);
+        var contentFg = EditorUtils.DefaultOrOverride(Theme.ContentForeground, defaults.ContentForeground!);
+        var statusFg = EditorUtils.DefaultOrOverride(Theme.StatusForeground, defaults.StatusForeground!);
+        var caret = EditorUtils.DefaultOrOverride(Theme.CaretColor, defaults.CaretColor!);
+
+        // Background precedence: Image > Color > Theme > Fallback; Transparent clears and ignores image.
+        var transparent = Theme.Transparent;
+        var hasImage = !transparent && !string.IsNullOrWhiteSpace(Theme.BackgroundImage);
+
+        var imageLayer = hasImage
+            ? $"background-image: linear-gradient({defaults.OverlayColor}, {defaults.OverlayColor}), url(\"{Theme.BackgroundImage!.Trim()}\"); background-size: cover; background-position: center; background-repeat: no-repeat;"
+            : string.Empty;
+
+        var toolbarBg = transparent
+            ? "transparent"
+            : hasImage
+                ? "transparent"
+                : string.IsNullOrWhiteSpace(Theme.ToolbarBackground)
+                    ? defaults.ToolbarBackground
+                    : Theme.ToolbarBackground!.Trim();
+
+        var contentBg = transparent
+            ? "transparent"
+            : hasImage
+                ? "transparent"
+                : string.IsNullOrWhiteSpace(Theme.ContentBackground)
+                    ? defaults.ContentBackground
+                    : Theme.ContentBackground!.Trim();
+
+        var statusBg = transparent
+            ? "transparent"
+            : hasImage
+                ? "transparent"
+                : string.IsNullOrWhiteSpace(Theme.StatusBackground)
+                    ? defaults.StatusBackground
+                    : Theme.StatusBackground!.Trim();
+
+        // Border: Specified > Theme > Fallback; if not outlined, no border.
+        var outlined = Theme.Outlined;
+
+        var borderColor = string.IsNullOrWhiteSpace(Theme.BorderColor)
+            ? defaults.BorderColor
+            : Theme.BorderColor!.Trim();
+
+        var borderCss = outlined
+            ? $"border: 1px solid {borderColor};"
+            : "border: none;";
+
+        // Size.
+        var sizeCss =
+            $"width: {(Width == 0 ? "100%" : $"{Width}px")}; height: {(Height == 0 ? "100%" : $"{Height}px")};";
+
+        // Compose styles.
+        _containerStyle = $"{sizeCss}{borderCss}{(hasImage ? imageLayer : string.Empty)}";
+        _toolbarStyle = $"{EditorUtils.Style("background-color", toolbarBg)}{EditorUtils.Style("color", toolbarFg)}";
+        _contentWrapperStyle = $"{EditorUtils.Style("background-color", contentBg)}";
+        _contentStyle = $"{EditorUtils.Style("color", contentFg)}{EditorUtils.Style("caret-color", caret)}";
+        _placeholderStyle = $"{EditorUtils.Style("color", contentFg)}opacity: 0.5;";
+        _statusStyle = $"{EditorUtils.Style("background-color", statusBg)}{EditorUtils.Style("color", statusFg)}";
     }
 
     /// <summary>
@@ -228,23 +327,11 @@ public partial class AllyariaEditor : ComponentBase
 
         try
         {
-            // Returns space-separated existing ids that have non-empty text; empty string if none
-            return await JsRuntime.InvokeAsync<string>("Allyaria_Editor_sanitizeLabelledBy", ids);
+            return await EnsureInterop().SanitizeLabelledByAsync(ids);
         }
         catch
         {
             return string.Empty;
         }
-    }
-
-    /// <summary>Validates the <c>aria-labelledby</c> IDs for all regions and updates internal state.</summary>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    private async Task ValidateLabelledByAsync()
-    {
-        _containerLabelledByResolved = await SanitizeLabelledByAsync(Labels.ContainerLabelledById);
-        _toolbarLabelledByResolved = await SanitizeLabelledByAsync(Labels.ToolbarLabelledById);
-        _contentLabelledByResolved = await SanitizeLabelledByAsync(Labels.ContentLabelledById);
-        _statusLabelledByResolved = await SanitizeLabelledByAsync(Labels.StatusLabelledById);
-        StateHasChanged();
     }
 }

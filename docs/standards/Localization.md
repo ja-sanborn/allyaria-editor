@@ -1,6 +1,8 @@
 # Localization Standards (Blazor-focused: C#, Razor, JavaScript, SCSS)
 
-Ensure every part of the application is fully localizable, accessible, and consistent across C#, Razor, JavaScript, and SCSS. Localization is **not optional**—all user-facing text, labels, errors, and accessibility attributes must support multiple languages and cultures.
+Ensure every part of the application is fully localizable, accessible, and consistent across C#, Razor, JavaScript, and
+SCSS. Localization is **not optional**—all user-facing text, labels, errors, and accessibility attributes must support
+multiple languages and cultures.
 
 > *Last updated: 2025-09-12*
 
@@ -242,4 +244,5 @@ export function announce(message) {
 
 ---
 
-> Following these standards ensures our Blazor library is accessible and usable in **all supported languages, cultures, and writing directions**.
+> Following these standards ensures our Blazor library is accessible and usable in **all supported languages, cultures,
+and writing directions**.
