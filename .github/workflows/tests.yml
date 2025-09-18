@@ -1,0 +1,88 @@
+﻿name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [ opened, synchronize, reopened, ready_for_review ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🧰 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: 💾 Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: 🔧 Restore
+        run: dotnet restore
+
+      - name: 🏗️ Build (Release)
+        run: dotnet build --configuration Release --no-restore
+
+      - name: 🧪 Test (Allyaria.Tests.Unit)
+        run: dotnet test tests/Allyaria.Tests.Unit --configuration Release --no-build --logger "trx;LogFileName=unit.trx" --results-directory TestResults
+
+      - name: 📦 Upload Unit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: TestResults/unit.trx
+
+  component-tests:
+    name: Component Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🧰 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: 💾 Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: 🔧 Restore
+        run: dotnet restore
+
+      - name: 🏗️ Build (Release)
+        run: dotnet build --configuration Release --no-restore
+
+      - name: 🧪 Test (Allyaria.Tests.Component)
+        run: dotnet test tests/Allyaria.Tests.Component --configuration Release --no-build --logger "trx;LogFileName=component.trx" --results-directory TestResults
+
+      - name: 📦 Upload Component Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: component-test-results
+          path: TestResults/component.trx

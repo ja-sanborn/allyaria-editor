@@ -26,8 +26,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{493084B8-8B91-4A63-A4EE-D816F4822061}"
 	ProjectSection(SolutionItems) = preProject
 		.github\CODEOWNERS = .github\CODEOWNERS
-		.github\dependabot.yml.bak = .github\dependabot.yml.bak
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+		.github\dependabot.yml = .github\dependabot.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "standards", "standards", "{910B2B97-5E69-40A0-8160-C9DBF4BD59C7}"
@@ -69,6 +69,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Allyaria.Tools.Analyzers", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Allyaria.Tools.SampleSite", "tools\Allyaria.Tools.SampleSite\Allyaria.Tools.SampleSite.csproj", "{90FBC1DE-A9B1-45B2-98E4-3C74B2B98A32}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{BAA0661D-AC3A-4447-BBAE-6F462F3732EA}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\tests.yml = .github\workflows\tests.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +92,7 @@ Global
 		{53FA0849-1F70-474E-9EDF-E0D3951FF569} = {DED658B6-9204-4927-A97F-5B52128BD09A}
 		{0B18A4A6-6DE6-4678-AA4A-8664B447D879} = {DED658B6-9204-4927-A97F-5B52128BD09A}
 		{90FBC1DE-A9B1-45B2-98E4-3C74B2B98A32} = {DED658B6-9204-4927-A97F-5B52128BD09A}
+		{BAA0661D-AC3A-4447-BBAE-6F462F3732EA} = {493084B8-8B91-4A63-A4EE-D816F4822061}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{196BBE22-A416-4CDE-9FCD-0BA41C430DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
