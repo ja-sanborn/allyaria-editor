@@ -5,7 +5,7 @@ using Allyaria.Tests.Component.Helpers;
 
 namespace Allyaria.Tests.Component.Components;
 
-public class AllyariaContentTests : TestContext
+public sealed class AllyariaContentTests : TestContext
 {
     [Fact]
     public void Focus_And_Blur_Bubble_To_Parent_Handlers()
@@ -29,8 +29,8 @@ public class AllyariaContentTests : TestContext
         content.Focus();
         content.Blur();
 
-        Assert.True(focused);
-        Assert.True(blurred);
+        focused.Should().BeTrue();
+        blurred.Should().BeTrue();
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class AllyariaContentTests : TestContext
             }
         );
 
-        Assert.Equal("<p>Hello</p>", updated);
+        updated.Should().Be("<p>Hello</p>");
     }
 
     [Fact]
@@ -78,8 +78,9 @@ public class AllyariaContentTests : TestContext
         );
 
         var placeholder = cut.Find("#ae-placeholder");
-        Assert.Equal("ToolbarType here...", placeholder.TextContent);
+        placeholder.TextContent.Should().Be("ToolbarType here...");
+
         var content = cut.Find("#ae-content");
-        Assert.Equal("ae-placeholder", content.GetAttribute("aria-describedby"));
+        content.GetAttribute("aria-describedby").Should().Be("ae-placeholder");
     }
 }

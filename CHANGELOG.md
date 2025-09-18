@@ -10,6 +10,9 @@ Introduces a strongly typed theming API with light/dark/high-contrast support, r
 - Runtime theme application with strict precedence for the background, foreground, caret, and border.
 - System/high-contrast detection with automatic application when ThemeType.System is used.
 - New documentation: Theming.md and CSS.md (CSS-only guidance).
+- xUnit tests for code coverage of base theming components.
+- FluentAssertions for testing.
+- NSubstitute for testing.
 
 ### Removed
 
@@ -19,6 +22,7 @@ Introduces a strongly typed theming API with light/dark/high-contrast support, r
 ### Fixed
 
 - Placeholder visibility and background-image overlay now ensure WCAG 2.2 AA contrast.
+- Updated CSharp.md to include info about testing
 
 ## [0.0.1] – 2025-09-16
 

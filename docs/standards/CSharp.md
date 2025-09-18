@@ -3,7 +3,7 @@
 These standards codify our team’s C# practices. They follow Microsoft’s recommended guidelines for .NET and add
 project-specific rules for consistency, documentation, reliability, and usability of our library code.
 
-> *Last updated: 2025-09-12*
+> *Last updated: 2025-09-17*
 
 ## 1. Universal Formatting
 
@@ -211,9 +211,152 @@ public static string RequireNonEmpty(string input, string paramName)
 
 ## 15. Testing Conventions
 
-* Unit test names follow: **`Method_Scenario_Expected`**
-  Example: `Create_WhenNameMissing_ThrowsArgumentException`
-* Tests should be deterministic, isolated, and explicit about Arrange/Act/Assert sections.
+This section defines conventions for **xUnit**, **bUnit**, **AwesomeAssertions** (FluentAssertions fork), and *
+*NSubstitute**.
+
+### 15.1 General test guidance
+
+* **Structure:** Arrange / Act / Assert (comment the sections).
+* **Naming:** `Method_Scenario_Expected` (or `Behavior_Scenario_Expected` for component tests).
+
+    * Example: `RecomputeStyles_WithBackgroundImage_UsesOverlayAndTransparentRegions`
+* **Determinism:** No randomness, time sleeps, or environment dependencies.
+* **Culture/time:** If relevant, set `CultureInfo.CurrentCulture/CurrentUICulture` within a test and restore in
+  `finally`.
+* **Parallelization:** Default parallel test execution is OK; use `[Collection]` only when you truly need shared state.
+* **What goes where:**
+
+    * **bUnit (component tests):** rendering, parameters, markup/DOM, events, interop wiring, CSS/output strings.
+    * **xUnit (unit tests):** pure logic (helpers, theming math, mappers), small services without rendering.
+    * Avoid duplicating the same assertion in both layers.
+
+### 15.2 xUnit (plain unit tests)
+
+* Use `[Fact]` for fixed inputs; `[Theory]` + `[InlineData]` for table-driven coverage.
+* Prefer **small focused tests** over large end-to-end checks.
+* Use **AwesomeAssertions** for expressive assertions (see §15.4).
+* Examples (EditorUtils):
+
+```csharp
+[Fact]
+public void DefaultOrOverride_WhenNullOrWhitespace_ReturnsFallback()
+{
+    EditorUtils.DefaultOrOverride("  ", "fallback").Should().Be("fallback");
+}
+
+[Fact]
+public void Style_WhenValueProvided_BuildsCssDeclaration()
+{
+    EditorUtils.Style("color", "#fff").Should().Be("color: #fff;");
+}
+```
+
+* For theming:
+
+    * Verify `GetDefaults(AeThemeType.Dark)` returns expected anchor values (e.g., content background, border, overlay).
+    * If style computation is extracted (recommended), unit test precedence:
+
+        * Transparent clears backgrounds
+        * Background image applies overlay + transparent regions
+        * Explicit overrides beat defaults
+        * Border on/off logic
+        * Width/Height `0` → `100%`
+
+### 15.3 bUnit (component tests)
+
+* **Test base:** derive test classes from `TestContext`.
+* **JS interop:** use bUnit’s `JSInterop`:
+
+    * `JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult("")`
+    * Avoid referencing concrete `JSRuntime`; rely on `IJSRuntime` provided by the test DI container.
+* **Helpers:** prefer shared helpers (e.g., `JsInteropSetups`) to keep tests terse and consistent.
+* **Rendering:** `RenderComponent<T>(ps => ps.Add(p => p.Param, value))`
+* **Assertions:** prefer stable selectors (`#id`, `.class`), and assert **intent**, not incidental details.
+
+    * For inline styles, assert key substrings rather than whole-string equality to avoid ordering brittleness.
+* **Events:** trigger with `TriggerEventAsync` and assert resulting state/parameters (`TextChanged`, `OnFocus`, etc).
+* **System theme detection:** set up the interop to return `"hc"`, `"dark"`, etc., and assert resulting styles.
+
+```csharp
+[Fact]
+public void Placeholder_Shown_And_Announced_When_Text_Empty()
+{
+    JSInterop.Setup<string>("Allyaria_Editor_sanitizeLabelledBy", _ => true).SetResult("");
+
+    var cut = RenderComponent<AllyariaContent>(ps => ps
+        .Add(p => p.Text, string.Empty)
+        .Add(p => p.Placeholder, "Start typing...")
+    );
+
+    cut.Find("#ae-placeholder").TextContent.Trim().Should().Be("Start typing...");
+    cut.Find("#ae-content").GetAttribute("aria-describedby").Should().Contain("ae-placeholder");
+}
+```
+
+### 15.4 Assertions with AwesomeAssertions (FluentAssertions fork)
+
+* Prefer **fluent assertions** for readability and helpful failure messages.
+* Typical patterns:
+
+    * Strings: `.Should().Be(...)`, `.Contain(...)`, `.NotBeNullOrEmpty()`, `.MatchRegex(...)`
+    * Objects: `.BeEquivalentTo(...)` for structural comparison
+    * Booleans: `.BeTrue()`, `.BeFalse()`
+    * Collections: `.HaveCount(...)`, `.Contain(...)`, `.OnlyContain(...)`
+* Examples:
+
+```csharp
+style.Should().Contain("background-color: #ffffff");
+updated.Should().Be("Hello world");
+elements.Should().HaveCount(3);
+```
+
+> Note: AwesomeAssertions mirrors FluentAssertions APIs; keep assertions **expressive** and **precise**.
+
+### 15.5 Test doubles with NSubstitute
+
+* Use **NSubstitute** for interface stubs/mocks when plain fakes are noisy.
+* Typical flow:
+
+    * `var interop = Substitute.For<IEditorJsInterop>();`
+    * `interop.SanitizeLabelledByAsync("id").Returns("id");`
+    * Pass the substitute into the component or service under test.
+    * Verify via `Received()`/`DidNotReceive()`:
+
+```csharp
+interop.Received(1).SanitizeLabelledByAsync(Arg.Is<string>(s => s.Contains("heading")));
+```
+
+* Prefer substitutes for **behavioral verification**; otherwise, stub only what the test needs.
+
+### 15.6 Test project layout
+
+```
+tests/
+  Allyaria.Tests.Component/         // bUnit
+    Content/...
+    Editor/...
+    Toolbar/...
+    Helpers/JsInteropSetups.cs
+  Allyaria.Tests.Unit/              // xUnit (pure logic)
+    Helpers/EditorUtilsTests.cs
+    Theming/ThemeDefaultsTests.cs
+    Theming/StyleEngineTests.cs     // if style math is extracted
+    Resources/EditorResourcesTests.cs
+```
+
+* Mirror `src/` folder names to keep navigation easy.
+* Keep helper extensions (e.g., `GetRequiredJsRuntime`, interop setups) in a shared `Helpers` folder.
+
+### 15.7 What to **not** test
+
+* Don’t assert private implementation details (e.g., exact order of concatenated CSS when intent can be asserted).
+* Don’t duplicate the same checks across bUnit and xUnit—choose the **most appropriate layer**.
+* Don’t serialize/deserialize for the sake of testing unless the API contract demands it.
+
+### 15.8 Build & CI
+
+* All test projects must build and run in CI with `dotnet test`.
+* Aim for **fast** unit tests; component tests are allowed to be slower but should still be concise.
 
 ## 16. Deviations
 

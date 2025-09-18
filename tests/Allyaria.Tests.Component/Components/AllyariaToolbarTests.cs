@@ -6,7 +6,7 @@ using Allyaria.Tests.Component.Helpers;
 
 namespace Allyaria.Tests.Component.Components;
 
-public class AllyariaToolbarTests : TestContext
+public sealed class AllyariaToolbarTests : TestContext
 {
     [Fact]
     public void Renders_Status_With_Default_Aria_Label()
@@ -24,8 +24,8 @@ public class AllyariaToolbarTests : TestContext
         );
 
         var status = cut.Find("#ae-status");
-        Assert.Equal("ae-status", status.ClassName);
-        Assert.Equal("Editor status", status.GetAttribute("aria-label"));
+        status.ClassName.Should().Be("ae-status");
+        status.GetAttribute("aria-label").Should().Be("Editor status");
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class AllyariaToolbarTests : TestContext
         );
 
         var toolbar = cut.Find("#ae-toolbar");
-        Assert.Equal("ae-toolbar", toolbar.ClassName);
-        Assert.Equal("Editor toolbar", toolbar.GetAttribute("aria-label"));
+        toolbar.ClassName.Should().Be("ae-toolbar");
+        toolbar.GetAttribute("aria-label").Should().Be("Editor toolbar");
     }
 }

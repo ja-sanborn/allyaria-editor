@@ -5,7 +5,7 @@ using Allyaria.Tests.Component.Helpers;
 
 namespace Allyaria.Tests.Component.Components;
 
-public class AllyariaEditorTests : TestContext
+public sealed class AllyariaEditorTests : TestContext
 {
     [Fact]
     public void Aria_Name_Defaults_From_Resx_When_No_Overrides()
@@ -16,7 +16,7 @@ public class AllyariaEditorTests : TestContext
         var content = cut.Find("#ae-content");
 
         // Should have aria-label with default
-        Assert.Equal("Editor content", content.GetAttribute("aria-label"));
+        content.GetAttribute("aria-label").Should().Be("Editor content");
     }
 
     [Fact]
@@ -39,13 +39,13 @@ public class AllyariaEditorTests : TestContext
         var statusStyle = cut.Find("#ae-status").GetAttribute("style") ?? string.Empty;
 
         // Assert (image layer present with 50% overlay; region backgrounds ignored/transparent)
-        Assert.Contains("background-image:", containerStyle);
-        Assert.Contains("linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5))", containerStyle); // Dark overlay50
-        Assert.Contains("url(\"paper.png\")", containerStyle);
+        containerStyle.Should().Contain("background-image:");
+        containerStyle.Should().Contain("linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5))"); // Dark overlay50
+        containerStyle.Should().Contain("url(\"paper.png\")");
 
-        Assert.Contains("background-color: transparent", toolbarStyle);
-        Assert.Contains("background-color: transparent", wrapperStyle);
-        Assert.Contains("background-color: transparent", statusStyle);
+        toolbarStyle.Should().Contain("background-color: transparent");
+        wrapperStyle.Should().Contain("background-color: transparent");
+        statusStyle.Should().Contain("background-color: transparent");
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public class AllyariaEditorTests : TestContext
         var wrapperStyle = cut.Find(".ae-content-wrapper").GetAttribute("style") ?? string.Empty;
 
         // Assert
-        Assert.Contains("background-color: #ffeeee", wrapperStyle);
+        wrapperStyle.Should().Contain("background-color: #ffeeee");
     }
 
     [Fact]
@@ -77,8 +77,8 @@ public class AllyariaEditorTests : TestContext
         var container = cut.Find("div.ae-editor");
 
         var style = container.GetAttribute("style") ?? string.Empty;
-        Assert.Contains("width: 400px", style);
-        Assert.Contains("height: 300px", style);
+        style.Should().Contain("width: 400px");
+        style.Should().Contain("height: 300px");
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class AllyariaEditorTests : TestContext
         var container = cut.Find("div.ae-editor");
 
         var style = container.GetAttribute("style") ?? string.Empty;
-        Assert.Contains("height: 100%", style);
+        style.Should().Contain("height: 100%");
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class AllyariaEditorTests : TestContext
         );
 
         var content = cut.Find("#ae-content");
-        Assert.Equal("Editor content", content.GetAttribute("aria-label"));
+        content.GetAttribute("aria-label").Should().Be("Editor content");
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class AllyariaEditorTests : TestContext
         cut.SetParametersAndRender(p => p.Add(x => x.Text, "Updated"));
 
         var content = cut.Find("#ae-content");
-        Assert.Contains("Updated", content.InnerHtml);
+        content.InnerHtml.Should().Contain("Updated");
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class AllyariaEditorTests : TestContext
         var cut = RenderComponent<AllyariaEditor>();
         var content = cut.Find("#ae-content");
 
-        Assert.Equal("textbox", content.GetAttribute("role"));
+        content.GetAttribute("role").Should().Be("textbox");
     }
 
     [Fact]
@@ -136,9 +136,9 @@ public class AllyariaEditorTests : TestContext
         JSInterop.SetupSanitizeLabelledBy();
 
         var cut = RenderComponent<AllyariaEditor>();
-        Assert.NotNull(cut.Find("#ae-toolbar"));
-        Assert.NotNull(cut.Find("#ae-content"));
-        Assert.NotNull(cut.Find("#ae-status"));
+        cut.Find("#ae-toolbar").Should().NotBeNull();
+        cut.Find("#ae-content").Should().NotBeNull();
+        cut.Find("#ae-status").Should().NotBeNull();
     }
 
     [Fact]
@@ -163,15 +163,15 @@ public class AllyariaEditorTests : TestContext
         var statusStyle = status.GetAttribute("style") ?? string.Empty;
 
         // Light defaults from GetDefaults
-        Assert.Contains("border: 1px solid #d0d7de", containerStyle);
-        Assert.Contains("background-color: #f6f8fa", toolbarStyle);
-        Assert.Contains("background-color: #ffffff", wrapperStyle);
-        Assert.Contains("background-color: #f6f8fa", statusStyle);
+        containerStyle.Should().Contain("border: 1px solid #d0d7de");
+        toolbarStyle.Should().Contain("background-color: #f6f8fa");
+        wrapperStyle.Should().Contain("background-color: #ffffff");
+        statusStyle.Should().Contain("background-color: #f6f8fa");
 
-        Assert.Contains("color: #24292f", toolbarStyle);
-        Assert.Contains("color: #24292f", contentStyle);
-        Assert.Contains("caret-color: #24292f", contentStyle);
-        Assert.Contains("color: #24292f", statusStyle);
+        toolbarStyle.Should().Contain("color: #24292f");
+        contentStyle.Should().Contain("color: #24292f");
+        contentStyle.Should().Contain("caret-color: #24292f");
+        statusStyle.Should().Contain("color: #24292f");
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class AllyariaEditorTests : TestContext
 
         // Verify initial (Light)
         var wrapper = cut.Find(".ae-content-wrapper");
-        Assert.Contains("background-color: #ffffff", wrapper.GetAttribute("style") ?? string.Empty);
+        wrapper.GetAttribute("style")!.Should().Contain("background-color: #ffffff");
 
         // Act: switch to Dark at runtime
         cut.SetParametersAndRender(p =>
@@ -195,7 +195,7 @@ public class AllyariaEditorTests : TestContext
 
         // Assert: updates without reload
         var wrapperStyleAfter = wrapper.GetAttribute("style") ?? string.Empty;
-        Assert.Contains("background-color: #0f1115", wrapperStyleAfter);
+        wrapperStyleAfter.Should().Contain("background-color: #0f1115");
     }
 
     [Fact]
@@ -215,9 +215,9 @@ public class AllyariaEditorTests : TestContext
         var contentStyle = cut.Find("#ae-content").GetAttribute("style") ?? string.Empty;
 
         // Assert (HighContrast defaults: black bg, white fg)
-        Assert.Contains("background-color: #000000", toolbarStyle);
-        Assert.Contains("background-color: #000000", wrapperStyle);
-        Assert.Contains("color: #ffffff", contentStyle);
+        toolbarStyle.Should().Contain("background-color: #000000");
+        wrapperStyle.Should().Contain("background-color: #000000");
+        contentStyle.Should().Contain("color: #ffffff");
     }
 
     [Fact]
@@ -241,10 +241,10 @@ public class AllyariaEditorTests : TestContext
         var statusStyle = cut.Find("#ae-status").GetAttribute("style") ?? string.Empty;
 
         // Assert
-        Assert.DoesNotContain("background-image:", containerStyle);
-        Assert.Contains("background-color: transparent", toolbarStyle);
-        Assert.Contains("background-color: transparent", wrapperStyle);
-        Assert.Contains("background-color: transparent", statusStyle);
+        containerStyle.Should().NotContain("background-image:");
+        toolbarStyle.Should().Contain("background-color: transparent");
+        wrapperStyle.Should().Contain("background-color: transparent");
+        statusStyle.Should().Contain("background-color: transparent");
     }
 
     [Fact]
@@ -258,8 +258,8 @@ public class AllyariaEditorTests : TestContext
         );
 
         var content = cut.Find("#ae-content");
-        Assert.Equal("heading1", content.GetAttribute("aria-labelledby"));
-        Assert.Null(content.GetAttribute("aria-label"));
+        content.GetAttribute("aria-labelledby").Should().Be("heading1");
+        content.GetAttribute("aria-label").Should().BeNull();
     }
 
     [Fact]
@@ -270,7 +270,7 @@ public class AllyariaEditorTests : TestContext
         var cut = RenderComponent<AllyariaEditor>(p => p.Add(x => x.AeLabels, new AeLabels("   ")));
         var container = cut.Find("div.ae-editor");
 
-        Assert.Equal("Editor", container.GetAttribute("aria-label"));
+        container.GetAttribute("aria-label").Should().Be("Editor");
     }
 
     [Fact]
@@ -282,6 +282,6 @@ public class AllyariaEditorTests : TestContext
         var container = cut.Find("div.ae-editor");
 
         var style = container.GetAttribute("style") ?? string.Empty;
-        Assert.Contains("width: 100%", style);
+        style.Should().Contain("width: 100%");
     }
 }
